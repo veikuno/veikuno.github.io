@@ -523,17 +523,38 @@
       min-height: 405px;
       overflow: hidden;
       border: 1px solid var(--line);
+      background: var(--ink);
+    }
+
+    .player-stage .player-art {
+      position: absolute;
+      z-index: 0;
+      inset: 0 auto 0 0;
+      width: 36%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 44% center;
+      opacity: .18;
+      transform: scale(1.12);
+      filter: grayscale(1) contrast(1.25) brightness(.66);
+      transition: opacity 1.15s var(--ease) .25s, transform 1.4s var(--ease) .2s, filter 1.2s var(--ease) .2s;
     }
 
     .player-stage .game-list {
+      position: relative;
+      z-index: 2;
+      width: 68%;
+      margin-left: 32%;
       border-top: 0;
       opacity: .12;
       transform: scale(.97);
       filter: blur(5px);
+      background: rgba(5,5,5,.72);
       transition: opacity 1s var(--ease) .35s, transform 1.1s var(--ease) .35s, filter 1s var(--ease) .35s;
     }
 
     .player-stage.open .game-list { opacity: 1; transform: scale(1); filter: blur(0); }
+    .player-stage.open .player-art { opacity: .82; transform: scale(1); filter: grayscale(1) contrast(1.18) brightness(.82); }
 
     .player-curtain {
       position: absolute;
@@ -699,15 +720,53 @@
     .projects .section-number { color: #666; }
     .projects h2 { margin-bottom: 66px; }
 
+    .archive-layout {
+      display: grid;
+      grid-template-columns: minmax(300px, .78fr) minmax(0, 1.22fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: stretch;
+    }
+
+    .archive-visual {
+      position: relative;
+      min-height: 610px;
+      overflow: hidden;
+      margin: 0;
+      background: var(--ink);
+    }
+
+    .archive-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: grayscale(1) contrast(1.2) brightness(.82);
+      transition: transform 1.1s var(--ease), filter .8s var(--ease);
+    }
+
+    .archive-visual:hover img { transform: scale(1.045); filter: grayscale(1) contrast(1.28) brightness(.92); }
+
+    .archive-caption {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      padding: 9px 12px;
+      color: var(--paper);
+      background: var(--ink);
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
     .project-list { border-top: 1px solid rgba(5,5,5,.3); }
 
     .project-card {
       position: relative;
       display: grid;
-      grid-template-columns: 70px 1.4fr 1fr auto;
-      gap: 30px;
+      grid-template-columns: 48px 1fr auto;
+      gap: 18px;
       align-items: center;
-      min-height: 180px;
+      min-height: 203px;
       padding: 24px 6px;
       border-bottom: 1px solid rgba(5,5,5,.3);
       transition: padding .45s var(--ease), color .35s ease, background .35s ease;
@@ -717,9 +776,9 @@
     .project-no, .project-meta { color: #666; font-size: .68rem; text-transform: uppercase; }
     .project-card:hover .project-no, .project-card:hover .project-meta { color: var(--grey-2); }
     .project-title { font: 600 clamp(1.8rem, 4vw, 4rem)/1 "Syne", sans-serif; letter-spacing: -.055em; text-transform: uppercase; }
-    .project-desc { max-width: 450px; color: #4d4d4b; font-size: .78rem; }
+    .project-desc { grid-column: 2; max-width: 450px; color: #4d4d4b; font-size: .78rem; }
     .project-card:hover .project-desc { color: var(--grey-1); }
-    .project-go { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; transition: transform .45s var(--ease); }
+    .project-go { grid-column: 3; grid-row: 1 / 3; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; transition: transform .45s var(--ease); }
     .project-card:hover .project-go { transform: rotate(-45deg); }
 
     .footer {
@@ -746,6 +805,7 @@
     }
 
     .footer h2 span { display: block; color: transparent; -webkit-text-stroke: 1px var(--paper); }
+    .footer-note { margin: -12px 0 22px; color: var(--grey-1); font-size: .76rem; letter-spacing: .05em; }
     .footer-icon { width: clamp(120px, 18vw, 260px); opacity: .28; filter: grayscale(1); animation: drift 7s ease-in-out infinite; }
 
     .footer-bottom {
@@ -801,6 +861,8 @@
       .game-row { grid-template-columns: 48px 1fr auto; }
       .game-id { grid-column: 2; }
       .game-arrow { grid-column: 3; grid-row: 1 / 3; }
+      .archive-layout { grid-template-columns: 1fr; }
+      .archive-visual { min-height: 430px; aspect-ratio: 16 / 9; }
       .project-card { grid-template-columns: 45px 1fr auto; }
       .project-desc { grid-column: 2; }
       .project-go { grid-column: 3; grid-row: 1 / 3; }
@@ -834,12 +896,16 @@
       .game-id { grid-column: 1; }
       .game-arrow { grid-column: 2; }
       .player-stage { min-height: 389px; }
+      .player-stage .player-art { inset: 0; width: 100%; opacity: .12; object-position: center; }
+      .player-stage.open .player-art { opacity: .42; }
+      .player-stage .game-list { width: 100%; margin-left: 0; background: rgba(5,5,5,.72); }
       .anime-link { grid-template-columns: 48px 1fr auto; gap: 14px; min-height: 96px; padding-right: 18px; }
       .anime-link.reveal.from-right { transform: translateY(40px); }
       .anime-link.reveal.from-right.in-view { transform: translateY(0); }
       .anime-icon { width: 40px; height: 40px; }
       .projects { padding: 105px 0; }
       .projects h2 { margin-bottom: 45px; }
+      .archive-visual { min-height: 0; aspect-ratio: 4 / 5; }
       .project-card { grid-template-columns: 1fr auto; gap: 14px; min-height: 150px; }
       .project-no { display: none; }
       .project-desc { grid-column: 1; }
@@ -917,7 +983,7 @@
           <span class="section-number">01 / Profile</span>
           <h2>Welcome to my <em>portfolio.</em></h2>
           <div class="profile-copy">
-            <p>Hi, my name is Leo and I'm from Sydney Australia. I like playing games, watching anime, drumming, and calisthenics.</p>
+            <p>Hi, my name is Leo and I'm from Sydney, Australia. I like playing games, watching anime, drumming, and calisthenics.</p>
             <p>If you would like to be mutuals feel free to add me on Instagram or Discord!</p>
           </div>
           <div class="facts stagger">
@@ -950,6 +1016,7 @@
         </div>
 
         <div class="player-stage stagger">
+          <img class="player-art" src="assets/player-index-art.png" alt="Monochrome winged character artwork" loading="lazy">
           <div class="game-list" id="player-list" inert>
             <button class="game-row" type="button" data-copy="804085448" aria-label="Copy Genshin Impact UID 804085448">
               <span class="game-no">001</span><span class="game-name">Genshin</span><span class="game-id">UID : 804085448</span><span class="game-arrow">↗</span>
@@ -986,25 +1053,32 @@
           <h2>Other<br>projects.</h2>
         </div>
 
-        <div class="project-list stagger">
-          <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
-            <span class="project-no">001</span>
-            <span class="project-title">Neon Collector</span>
-            <span class="project-desc">A fast Unity arcade challenge - collect the glowing orbs, avoid the chaser, beat the clock.</span>
-            <span class="project-go">↗</span>
-          </a>
-          <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
-            <span class="project-no">002</span>
-            <span class="project-title">Unity Lab</span>
-            <span class="project-desc">Small game mechanics, experiments, and ideas built while learning through practice.</span>
-            <span class="project-go">↗</span>
-          </a>
-          <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
-            <span class="project-no">003</span>
-            <span class="project-title">GitHub Archive</span>
-            <span class="project-desc">The full collection of code, works in progress, and whatever comes next.</span>
-            <span class="project-go">↗</span>
-          </a>
+        <div class="archive-layout">
+          <figure class="archive-visual reveal from-left">
+            <img src="assets/archive-art.png" alt="Monochrome winged character standing beside a city fence" loading="lazy">
+            <figcaption class="archive-caption">Archive visual / 002</figcaption>
+          </figure>
+
+          <div class="project-list stagger">
+            <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
+              <span class="project-no">001</span>
+              <span class="project-title">Neon Collector</span>
+              <span class="project-desc">A fast Unity arcade challenge - collect the glowing orbs, avoid the chaser, beat the clock.</span>
+              <span class="project-go">↗</span>
+            </a>
+            <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
+              <span class="project-no">002</span>
+              <span class="project-title">Unity Lab</span>
+              <span class="project-desc">Small game mechanics, experiments, and ideas built while learning through practice.</span>
+              <span class="project-go">↗</span>
+            </a>
+            <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
+              <span class="project-no">003</span>
+              <span class="project-title">GitHub Archive</span>
+              <span class="project-desc">The full collection of code, works in progress, and whatever comes next.</span>
+              <span class="project-go">↗</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -1015,7 +1089,8 @@
       <div class="footer-grid">
         <div class="reveal">
           <span class="section-number">04 / Stay connected</span>
-          <h2>See you<span>online.</span></h2>
+          <h2>See you<span>next time.</span></h2>
+          <p class="footer-note">Follow if you want to be moots!</p>
           <a class="button primary" href="https://www.instagram.com/veikuno/" target="_blank" rel="noreferrer">@veikuno on Instagram <span class="arrow">↗</span></a>
         </div>
         <img class="footer-icon" src="assets/icon-globe.png" alt="Pixel globe" loading="lazy">

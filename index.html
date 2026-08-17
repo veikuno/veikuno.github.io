@@ -149,11 +149,16 @@
 
     .hero-copy { position: relative; z-index: 3; }
 
-    .hero-copy .kicker { animation: intro-rise .8s var(--ease) both .05s; }
-    .hero-copy .hero-line { animation: intro-rise 1s var(--ease) both .12s; }
-    .hero-copy .hero-line:nth-child(2) { animation-delay: .22s; }
-    .hero-copy .hero-intro { animation: intro-rise .9s var(--ease) both .34s; }
-    .hero-copy .hero-actions { animation: intro-rise .9s var(--ease) both .44s; }
+    .hero-copy .kicker,
+    .hero-copy .hero-line,
+    .hero-copy .hero-intro,
+    .hero-copy .hero-actions { opacity: 0; transform: translateY(45px); }
+
+    .hero.in-view .hero-copy .kicker { animation: intro-rise .8s var(--ease) both .05s; }
+    .hero.in-view .hero-copy .hero-line { animation: intro-rise 1s var(--ease) both .12s; }
+    .hero.in-view .hero-copy .hero-line:nth-child(2) { animation-delay: .22s; }
+    .hero.in-view .hero-copy .hero-intro { animation: intro-rise .9s var(--ease) both .34s; }
+    .hero.in-view .hero-copy .hero-actions { animation: intro-rise .9s var(--ease) both .44s; }
 
     .kicker {
       display: flex;
@@ -224,9 +229,11 @@
       width: 100%;
       object-fit: cover;
       filter: grayscale(1) contrast(1.12);
-      clip-path: polygon(8% 0, 100% 5%, 93% 100%, 0 94%);
-      animation: photo-reveal 1.4s var(--ease) both .2s;
+      opacity: 0;
+      clip-path: polygon(8% 0, 100% 5%, 100% 5%, 8% 0);
     }
+
+    .hero.in-view .hero-photo { animation: photo-reveal 1.4s var(--ease) both .2s; }
 
     .hero-visual::before {
       position: absolute;
@@ -1026,19 +1033,30 @@
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const progress = document.querySelector('.scroll-progress');
     const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
+    const playerStage = document.querySelector('.player-stage');
+    const playerCurtain = document.querySelector('.player-curtain');
+    const playerList = document.getElementById('player-list');
 
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    const resetPlayerCurtain = () => {
+      playerStage.classList.remove('open');
+      playerCurtain.setAttribute('aria-expanded', 'false');
+      playerList.setAttribute('inert', '');
+    };
 
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('in-view');
-          revealObserver.unobserve(entry.target);
+        } else {
+          entry.target.classList.remove('in-view');
+          if (entry.target === playerStage) resetPlayerCurtain();
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
-    document.querySelectorAll('.reveal, .stagger, .scene-reveal').forEach((element) => revealObserver.observe(element));
+    document.querySelectorAll('.hero, .reveal, .stagger, .scene-reveal').forEach((element) => revealObserver.observe(element));
 
     if (!reducedMotion) {
       let ticking = false;
@@ -1072,10 +1090,6 @@
 
     const copyMessage = document.querySelector('.copy-message');
     let copyTimer;
-
-    const playerStage = document.querySelector('.player-stage');
-    const playerCurtain = document.querySelector('.player-curtain');
-    const playerList = document.getElementById('player-list');
 
     playerCurtain.addEventListener('click', () => {
       playerStage.classList.add('open');

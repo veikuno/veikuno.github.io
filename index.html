@@ -37,6 +37,8 @@
       font: 400 16px/1.5 "DM Mono", monospace;
     }
 
+    body.intro-active { overflow: hidden; }
+
     body::before {
       position: fixed;
       z-index: 50;
@@ -52,8 +54,116 @@
     a { color: inherit; text-decoration: none; }
     button { color: inherit; font: inherit; }
     img { display: block; max-width: 100%; }
+    [data-tilt] { transform-style: preserve-3d; will-change: transform; transition: transform .22s ease-out; }
 
     .page { width: var(--page); margin-inline: auto; }
+
+    .intro-screen {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: var(--paper);
+      background: var(--ink);
+    }
+
+    .intro-screen::before {
+      position: absolute;
+      z-index: 0;
+      inset: -3%;
+      content: "";
+      background:
+        linear-gradient(rgba(5,5,5,.28), rgba(5,5,5,.68)),
+        url("assets/intro-background-art.png") center 28% / cover no-repeat;
+      filter: grayscale(1) contrast(1.16) brightness(.72);
+      transform: scale(1.03);
+      transition: filter 1.1s var(--ease), transform 1.4s var(--ease);
+    }
+
+    .intro-screen::after {
+      position: absolute;
+      z-index: 4;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      opacity: .18;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.06) 3px 4px);
+      animation: scan-lines 9s linear infinite;
+    }
+
+    .intro-panel {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      bottom: 0;
+      width: 50.1%;
+      background: rgba(5,5,5,.48);
+      backdrop-filter: blur(1.5px);
+      transition: transform 1.3s var(--ease) .15s, background .28s ease;
+    }
+
+    .intro-panel::after { position: absolute; inset: 24px; content: ""; border: 1px solid var(--line); }
+    .intro-panel.left { left: 0; border-right: 1px solid var(--paper); }
+    .intro-panel.right { right: 0; border-left: 1px solid var(--paper); }
+
+    .intro-inner {
+      position: relative;
+      z-index: 3;
+      width: min(820px, calc(100% - 40px));
+      text-align: center;
+      transition: opacity .45s ease, transform .7s var(--ease);
+    }
+
+    .intro-code { margin-bottom: 30px; color: var(--grey-2); font-size: .65rem; letter-spacing: .16em; text-transform: uppercase; }
+
+    .intro-title {
+      position: relative;
+      margin: 0;
+      font: 700 clamp(4.5rem, 14vw, 11rem)/.72 "Syne", sans-serif;
+      letter-spacing: -.09em;
+      text-transform: uppercase;
+    }
+
+    .intro-title span { display: block; color: transparent; -webkit-text-stroke: 1px var(--paper); }
+
+    .intro-progress {
+      width: min(520px, 90%);
+      margin: 46px auto 18px;
+      text-align: left;
+    }
+
+    .intro-progress-meta { display: flex; justify-content: space-between; margin-bottom: 9px; color: var(--grey-1); font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; }
+    .intro-progress-track { height: 2px; overflow: hidden; background: var(--grey-3); }
+    .intro-progress-bar { width: 100%; height: 100%; transform: scaleX(0); transform-origin: left; background: var(--paper); transition: transform .12s linear; }
+
+    .intro-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px; }
+
+    .intro-enter,
+    .intro-sound {
+      min-height: 52px;
+      padding: 0 22px;
+      border: 1px solid var(--paper);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .3s ease, background .3s ease, opacity .3s ease, transform .3s var(--ease);
+    }
+
+    .intro-enter { color: var(--ink); background: var(--paper); }
+    .intro-enter:disabled { opacity: .28; cursor: wait; }
+    .intro-enter:not(:disabled):hover { transform: translateY(-4px); color: var(--paper); background: var(--ink); }
+    .intro-sound { color: var(--paper); background: var(--ink); }
+    .intro-sound:hover { color: var(--ink); background: var(--paper); }
+
+    .intro-screen.leaving .intro-panel { background: var(--paper); }
+    .intro-screen.leaving::before { filter: grayscale(1) contrast(1.2) brightness(.5) blur(7px); transform: scale(1.14); }
+    .intro-screen.leaving .intro-panel::after { border-color: rgba(5,5,5,.35); }
+    .intro-screen.leaving .intro-panel.left { transform: translateX(-101%); }
+    .intro-screen.leaving .intro-panel.right { transform: translateX(101%); }
+    .intro-screen.leaving .intro-inner { opacity: 0; transform: scale(.86); }
+    .intro-screen.done { visibility: hidden; pointer-events: none; }
 
     .scroll-progress {
       position: fixed;
@@ -127,6 +237,21 @@
     .nav-links a:hover { color: var(--white); }
     .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
+    .sound-toggle {
+      min-width: 86px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      color: var(--grey-1);
+      background: transparent;
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .25s ease, border-color .25s ease, background .25s ease;
+    }
+
+    .sound-toggle:hover { color: var(--ink); border-color: var(--paper); background: var(--paper); }
+
     .hero {
       position: relative;
       min-height: 100svh;
@@ -135,6 +260,65 @@
       align-items: end;
       isolation: isolate;
     }
+
+    .hero::before {
+      position: absolute;
+      z-index: 0;
+      inset: -2%;
+      content: "";
+      opacity: .7;
+      background:
+        linear-gradient(90deg, rgba(5,5,5,.9) 0%, rgba(5,5,5,.58) 42%, rgba(5,5,5,.38) 68%, rgba(5,5,5,.68) 100%),
+        linear-gradient(0deg, rgba(5,5,5,.62), rgba(5,5,5,.03) 52%, rgba(5,5,5,.44)),
+        url("assets/hero-background-art.png") center 28% / cover no-repeat;
+      filter: grayscale(1) contrast(1.16) brightness(.94);
+      transform: scale(1.05);
+      transition: filter 1.4s var(--ease), opacity 1.4s ease, transform 1.8s var(--ease);
+    }
+
+    body.site-ready .hero::before { opacity: .76; filter: grayscale(1) contrast(1.16) brightness(1.06); transform: scale(1); }
+
+    .hero-entry-doors {
+      position: absolute;
+      z-index: 9;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      pointer-events: none;
+      transition: visibility 0s linear 1.6s;
+    }
+
+    .hero-entry-door {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      align-items: center;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(5,5,5,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(5,5,5,.08) 1px, transparent 1px),
+        var(--paper);
+      background-size: 36px 36px;
+      transition: transform 1.55s var(--ease) .05s;
+    }
+
+    .hero-entry-door::after { position: absolute; inset: 24px; content: ""; border: 1px solid rgba(5,5,5,.26); }
+    .hero-entry-door.left { justify-items: end; border-right: 1px solid var(--ink); transform-origin: left; }
+    .hero-entry-door.right { justify-items: start; border-left: 1px solid var(--ink); transform-origin: right; }
+
+    .hero-entry-door strong {
+      position: relative;
+      z-index: 1;
+      font: 700 clamp(4rem, 11vw, 11rem)/1 "Syne", sans-serif;
+      letter-spacing: -.08em;
+      opacity: .16;
+    }
+
+    .hero-entry-door.left strong { transform: translateX(12%); }
+    .hero-entry-door.right strong { transform: translateX(-12%); }
+    body.hero-door-opening .hero-entry-doors { visibility: hidden; }
+    body.hero-door-opening .hero-entry-door.left { transform: translateX(-101%); }
+    body.hero-door-opening .hero-entry-door.right { transform: translateX(101%); }
 
     .hero-grid {
       position: relative;
@@ -154,11 +338,31 @@
     .hero-copy .hero-intro,
     .hero-copy .hero-actions { opacity: 0; transform: translateY(45px); }
 
-    .hero.in-view .hero-copy .kicker { animation: intro-rise .8s var(--ease) both .05s; }
-    .hero.in-view .hero-copy .hero-line { animation: intro-rise 1s var(--ease) both .12s; }
-    .hero.in-view .hero-copy .hero-line:nth-child(2) { animation-delay: .22s; }
-    .hero.in-view .hero-copy .hero-intro { animation: intro-rise .9s var(--ease) both .34s; }
-    .hero.in-view .hero-copy .hero-actions { animation: intro-rise .9s var(--ease) both .44s; }
+    body.intro-active .hero-grid { opacity: 0; transform: scale(.94); }
+    body.site-ready .hero-grid { animation: hero-stage-in 1.3s var(--ease) both .18s; }
+    body.site-ready .hero.in-view .hero-copy .kicker { animation: intro-rise .8s var(--ease) both .28s; }
+    body.site-ready .hero.in-view .hero-copy .hero-line { animation: intro-rise 1s var(--ease) both .36s; }
+    body.site-ready .hero.in-view .hero-copy .hero-line:nth-child(2) { animation-delay: .46s; }
+    body.site-ready .hero.in-view .hero-copy .hero-intro { animation: intro-rise .9s var(--ease) both .58s; }
+    body.site-ready .hero.in-view .hero-copy .hero-actions { animation: intro-rise .9s var(--ease) both .68s; }
+
+    .hero::after {
+      position: absolute;
+      z-index: 8;
+      top: 0;
+      bottom: 0;
+      left: -4%;
+      width: clamp(4px, .8vw, 12px);
+      pointer-events: none;
+      content: "";
+      opacity: 0;
+      background: var(--paper);
+      box-shadow: 0 0 55px rgba(255,255,255,.55);
+      transform: scaleY(0);
+      transform-origin: center;
+    }
+
+    body.site-ready .hero::after { animation: hero-entry-scan 1.35s var(--ease) both .12s; }
 
     .kicker {
       display: flex;
@@ -233,7 +437,7 @@
       clip-path: polygon(8% 0, 100% 5%, 100% 5%, 8% 0);
     }
 
-    .hero.in-view .hero-photo { animation: photo-reveal 1.4s var(--ease) both .2s; }
+    body.site-ready .hero.in-view .hero-photo { animation: photo-reveal 1.4s var(--ease) both .48s; }
 
     .hero-visual::before {
       position: absolute;
@@ -323,6 +527,44 @@
     }
 
     .marquee-track span::after { margin: 0 28px; content: "✦"; font-size: .65em; }
+
+    .icon-divider {
+      overflow: hidden;
+      border-block: 1px solid var(--line);
+      background: var(--ink);
+    }
+
+    .icon-divider-track {
+      width: max-content;
+      display: flex;
+      animation: marquee 26s linear infinite;
+    }
+
+    .icon-divider.reverse .icon-divider-track { animation-direction: reverse; }
+
+    .icon-divider-loop {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 4vw, 62px);
+      padding: 9px clamp(24px, 4vw, 62px) 9px 0;
+    }
+
+    .icon-divider-item {
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 4vw, 62px);
+    }
+
+    .icon-divider-item img {
+      width: clamp(46px, 4vw, 62px);
+      height: clamp(46px, 4vw, 62px);
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.18);
+      mix-blend-mode: screen;
+    }
+
+    .icon-divider-item::after { content: "✦"; color: var(--grey-1); font-size: .72rem; }
 
     section { position: relative; }
 
@@ -427,6 +669,205 @@
     .fact { min-height: 115px; padding: 20px; background: var(--ink); }
     .fact small { display: block; margin-bottom: 25px; color: var(--grey-2); font-size: .62rem; text-transform: uppercase; }
     .fact span { font-family: "Syne", sans-serif; font-weight: 600; }
+
+    .profile-notes { margin-top: 20px; border: 1px solid var(--line); }
+
+    .profile-note-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .profile-note-button {
+      min-height: 50px;
+      padding: 10px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      color: var(--grey-1);
+      background: transparent;
+      font-size: .64rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .3s ease, background .3s ease;
+    }
+
+    .profile-note-button:last-child { border-right: 0; }
+    .profile-note-button:hover,
+    .profile-note-button.active { color: var(--ink); background: var(--paper); }
+
+    .profile-note-output { min-height: 115px; display: grid; align-content: center; gap: 10px; padding: 22px; }
+    .profile-note-label { color: var(--grey-2); font-size: .6rem; letter-spacing: .13em; text-transform: uppercase; }
+    .profile-note-text { margin: 0; color: var(--grey-1); font-size: .84rem; }
+    .profile-note-output.switching { animation: text-switch .45s var(--ease); }
+
+    .profile-grid { transition: opacity .8s ease, filter .9s ease; }
+
+    .profile.profile-locked {
+      min-height: 100svh;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .profile.profile-locked .profile-grid {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--page);
+      transform: translate(-50%, -50%);
+      opacity: .08;
+      filter: blur(10px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .profile-hatch {
+      position: absolute;
+      z-index: 8;
+      inset: 0;
+      min-height: 100svh;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      transition: visibility 0s linear 1.35s;
+    }
+
+    .hatch-panel {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50.2%;
+      background-color: var(--ink);
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 38px 38px;
+      transition: transform 1.15s var(--ease) .28s;
+    }
+
+    .hatch-panel.left { left: 0; border-right: 1px solid var(--line); }
+    .hatch-panel.right { right: 0; border-left: 1px solid var(--line); }
+
+    .hatch-assembly {
+      position: relative;
+      z-index: 2;
+      width: min(720px, calc(100% - 32px));
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      text-align: center;
+      transition: transform .85s var(--ease), opacity .6s ease;
+    }
+
+    .hatch-kicker { color: var(--grey-2); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; }
+
+    .hatch-frame {
+      --hatch-progress: 0deg;
+      position: relative;
+      width: clamp(320px, 43vw, 530px);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: clamp(10px, 1.4vw, 17px) solid var(--paper);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(5,5,5,.78) 0 30%, rgba(5,5,5,.38) 58%, rgba(5,5,5,.68) 100%),
+        url("assets/profiles-lock-art.png") center 38% / cover no-repeat;
+      filter: grayscale(1) contrast(1.12);
+      box-shadow: inset 0 0 0 2px var(--grey-3), 0 0 0 2px var(--grey-3), 0 0 0 16px #111, 0 0 0 18px var(--grey-3);
+    }
+
+    .hatch-frame::before {
+      position: absolute;
+      inset: -8px;
+      content: "";
+      border-radius: 50%;
+      background: conic-gradient(var(--paper) var(--hatch-progress), var(--grey-3) 0);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 0);
+      mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 0);
+      transition: background .15s linear;
+      pointer-events: none;
+    }
+
+    .hatch-bolt {
+      position: absolute;
+      z-index: 2;
+      width: clamp(13px, 1.5vw, 20px);
+      aspect-ratio: 1;
+      border: 2px solid var(--paper);
+      border-radius: 50%;
+      background: var(--ink);
+      transition: transform .45s var(--ease), background .35s ease;
+    }
+
+    .hatch-bolt:nth-of-type(1) { left: 49%; top: 3%; }
+    .hatch-bolt:nth-of-type(2) { right: 12%; top: 19%; }
+    .hatch-bolt:nth-of-type(3) { right: 3%; top: 49%; }
+    .hatch-bolt:nth-of-type(4) { right: 12%; bottom: 18%; }
+    .hatch-bolt:nth-of-type(5) { left: 49%; bottom: 3%; }
+    .hatch-bolt:nth-of-type(6) { left: 12%; bottom: 18%; }
+    .hatch-bolt:nth-of-type(7) { left: 3%; top: 49%; }
+    .hatch-bolt:nth-of-type(8) { left: 12%; top: 19%; }
+
+    .hatch-wheel {
+      --wheel-angle: 0deg;
+      position: relative;
+      z-index: 3;
+      width: clamp(175px, 22vw, 235px);
+      aspect-ratio: 1;
+      padding: 0;
+      border: clamp(8px, 1vw, 12px) solid var(--paper);
+      border-radius: 50%;
+      color: var(--paper);
+      background: var(--ink);
+      transform: rotate(var(--wheel-angle));
+      transition: transform .16s linear, color .3s ease, background .3s ease;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .hatch-wheel:active { cursor: grabbing; }
+    .hatch-wheel:hover { color: var(--ink); background: var(--paper); }
+    .hatch-wheel::before { position: absolute; z-index: 3; left: 50%; top: 50%; width: 34%; aspect-ratio: 1; content: ""; transform: translate(-50%, -50%); border: 7px solid currentColor; border-radius: 50%; background: inherit; }
+
+    .hatch-spoke {
+      position: absolute;
+      left: 50%;
+      top: calc(50% - 5px);
+      width: 43%;
+      height: 10px;
+      border-radius: 2px;
+      background: currentColor;
+      transform-origin: 0 50%;
+    }
+
+    .hatch-spoke:nth-child(1) { transform: rotate(0deg); }
+    .hatch-spoke:nth-child(2) { transform: rotate(60deg); }
+    .hatch-spoke:nth-child(3) { transform: rotate(120deg); }
+    .hatch-spoke:nth-child(4) { transform: rotate(180deg); }
+    .hatch-spoke:nth-child(5) { transform: rotate(240deg); }
+    .hatch-spoke:nth-child(6) { transform: rotate(300deg); }
+
+    .hatch-instruction { margin: 0; font: 600 clamp(1.15rem, 2.5vw, 2rem)/1 "Syne", sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+    .hatch-help { margin: -7px 0 0; color: var(--grey-2); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
+    .hatch-status { color: var(--grey-1); font-size: .65rem; letter-spacing: .11em; text-transform: uppercase; }
+    .hatch-progress { display: flex; gap: 9px; }
+    .hatch-progress span { width: 36px; height: 4px; border: 1px solid var(--grey-2); transition: background .3s ease, border-color .3s ease; }
+    .profile-hatch[data-stage="1"] .hatch-progress span:nth-child(1),
+    .profile-hatch[data-stage="2"] .hatch-progress span:nth-child(-n+2),
+    .profile-hatch[data-stage="3"] .hatch-progress span { border-color: var(--paper); background: var(--paper); }
+    .profile-hatch[data-stage="1"] .hatch-bolt:nth-of-type(odd),
+    .profile-hatch[data-stage="2"] .hatch-bolt,
+    .profile-hatch[data-stage="3"] .hatch-bolt { transform: rotate(45deg) scale(.82); background: var(--paper); }
+    .profile.profile-locked .profile-hatch:not(.arrived) .hatch-panel.left { transform: translateX(-102%); }
+    .profile.profile-locked .profile-hatch:not(.arrived) .hatch-panel.right { transform: translateX(102%); }
+    .profile.profile-locked .profile-hatch:not(.arrived) .hatch-assembly { transform: scale(.72) rotate(-12deg); opacity: 0; }
+    .profile-hatch.opening .hatch-panel.left { transform: translateX(-102%); }
+    .profile-hatch.opening .hatch-panel.right { transform: translateX(102%); }
+    .profile-hatch.opening .hatch-assembly { transform: scale(1.28) rotate(-16deg); opacity: 0; }
+    .profile.hatch-open .profile-hatch { visibility: hidden; pointer-events: none; }
+    .profile.profile-locked .profile-hatch { visibility: visible; transition-delay: 0s; }
 
     .cinematic {
       position: relative;
@@ -572,7 +1013,10 @@
       bottom: 0;
       width: 50.1%;
       overflow: hidden;
-      background: var(--paper);
+      background-color: var(--ink);
+      background-position: center;
+      background-size: cover;
+      filter: grayscale(1) contrast(1.12) brightness(.72);
       transition: transform 1.25s var(--ease);
     }
 
@@ -583,10 +1027,10 @@
       border: 1px solid rgba(5,5,5,.22);
     }
 
-    .player-door::before { inset: 18px; }
-    .player-door::after { inset: 38px; }
-    .player-door.left { left: 0; border-right: 1px solid var(--ink); }
-    .player-door.right { right: 0; border-left: 1px solid var(--ink); }
+    .player-door::before { inset: 0; border: 0; background: linear-gradient(rgba(5,5,5,.12), rgba(5,5,5,.45)); }
+    .player-door::after { inset: 22px; border-color: rgba(255,255,255,.48); }
+    .player-door.left { left: 0; border-right: 1px solid var(--paper); background-image: url("assets/player-door-left.png"); background-position: 46% center; }
+    .player-door.right { right: 0; border-left: 1px solid var(--paper); background-image: url("assets/player-door-right.png"); background-position: 54% center; }
     .player-stage.open .player-door.left { transform: translateX(-101%); }
     .player-stage.open .player-door.right { transform: translateX(101%); }
 
@@ -711,12 +1155,264 @@
 
     .copy-message.visible { transform: translateY(0); opacity: 1; }
 
+    .terminal-section {
+      overflow: hidden;
+      padding: 150px 0 170px;
+      border-top: 1px solid var(--line);
+      background: #0a0a0a;
+    }
+
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      align-items: end;
+      margin-bottom: 50px;
+    }
+
+    .terminal-header h2 {
+      margin: 24px 0 0;
+      font: 600 clamp(3rem, 7vw, 7.2rem)/.84 "Syne", sans-serif;
+      letter-spacing: -.07em;
+      text-transform: uppercase;
+    }
+
+    .terminal-header p { max-width: 340px; margin: 0 0 8px; color: var(--grey-2); font-size: .72rem; text-align: right; }
+
+    .terminal-shell {
+      overflow: hidden;
+      border: 1px solid var(--grey-2);
+      background: var(--ink);
+      box-shadow: 18px 18px 0 var(--paper);
+    }
+
+    .terminal-bar {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--grey-2);
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .terminal-lights { display: flex; gap: 7px; }
+    .terminal-lights span { width: 8px; height: 8px; border: 1px solid var(--grey-2); border-radius: 50%; }
+
+    .terminal-body { min-height: 370px; display: grid; grid-template-columns: 290px 1fr; }
+
+    .terminal-commands {
+      display: grid;
+      align-content: start;
+      border-right: 1px solid var(--line);
+    }
+
+    .terminal-command {
+      min-height: 64px;
+      padding: 0 22px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--grey-1);
+      background: transparent;
+      font-size: .78rem;
+      text-align: left;
+      cursor: pointer;
+      transition: color .3s ease, background .3s ease, padding .35s var(--ease);
+    }
+
+    .terminal-command:hover,
+    .terminal-command.active { padding-left: 32px; color: var(--ink); background: var(--paper); }
+
+    .terminal-output {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-width: 0;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      padding: clamp(28px, 5vw, 70px);
+    }
+
+    .terminal-output::before {
+      position: absolute;
+      z-index: -2;
+      inset: -1px;
+      content: "";
+      opacity: .78;
+      background:
+        linear-gradient(90deg, rgba(5,5,5,.8) 0%, rgba(5,5,5,.46) 62%, rgba(5,5,5,.58) 100%),
+        url("assets/terminal-scenes-art.png") center 0% / cover no-repeat;
+      filter: grayscale(1) contrast(1.16) brightness(.82);
+      transform: scale(1.02);
+      transition: background-position .85s var(--ease), filter .45s ease, opacity .45s ease;
+    }
+
+    .terminal-output::after { position: absolute; right: 22px; top: 18px; content: "LIVE / VK_OS"; color: var(--grey-2); font-size: .6rem; letter-spacing: .1em; }
+    .terminal-output > * { position: relative; z-index: 1; text-shadow: 0 2px 18px rgba(5,5,5,.9); }
+    .terminal-output[data-scene="ready"]::before { background-position: center 0%; }
+    .terminal-output[data-scene="instagram"]::before { background-position: center 18%; }
+    .terminal-output[data-scene="discord"]::before { background-position: center 36%; }
+    .terminal-output[data-scene="github"]::before { background-position: center 54%; }
+    .terminal-output[data-scene="myanimelist"]::before { background-position: center 72%; }
+    .terminal-output[data-scene="player_ids"]::before { background-position: center 100%; }
+    .terminal-prompt { color: var(--grey-2); font-size: .66rem; letter-spacing: .08em; }
+    .terminal-result-title { font: 600 clamp(1.6rem, 4vw, 3.8rem)/1 "Syne", sans-serif; letter-spacing: -.04em; text-transform: uppercase; }
+    .terminal-result-copy { max-width: 680px; margin: 0; color: var(--grey-1); font-size: .82rem; }
+
+    .terminal-action {
+      width: fit-content;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 15px;
+      border: 1px solid var(--paper);
+      color: var(--ink);
+      background: var(--paper);
+      font-size: .65rem;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .3s ease, background .3s ease;
+    }
+
+    .terminal-action:hover { color: var(--paper); background: transparent; }
+    .terminal-id-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .terminal-output.switching { animation: terminal-flash .42s steps(2, end); }
+
+    .terminal-gift { position: relative; isolation: isolate; }
+
+    .terminal-gift .terminal-shell {
+      transition: filter .8s var(--ease), transform .9s var(--ease), opacity .7s ease;
+    }
+
+    .terminal-gift:not(.opened) .terminal-shell { transform: scale(.975); filter: blur(8px); }
+    .terminal-gift:not(.arrived) .terminal-shell { opacity: 0; transform: scale(.91); filter: blur(14px); }
+
+    .gift-wrap {
+      position: absolute;
+      z-index: 6;
+      inset: 0;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .gift-paper {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50.2%;
+      overflow: hidden;
+      border: 1px solid var(--ink);
+      background: var(--paper);
+      transition: transform 1.15s var(--ease) .2s;
+    }
+
+    .gift-paper::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 200%;
+      content: "";
+      background:
+        linear-gradient(rgba(255,255,255,.05), rgba(5,5,5,.18)),
+        url("assets/terminal-wrap-art.png") center / cover no-repeat;
+      filter: grayscale(1) contrast(1.12) brightness(.96);
+      transform: scale(1.02);
+    }
+
+    .gift-paper::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      opacity: .22;
+      background-image:
+        linear-gradient(rgba(5,5,5,.24) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(5,5,5,.24) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    .gift-paper.left { left: 0; transform-origin: left center; }
+    .gift-paper.right { right: 0; transform-origin: right center; }
+    .gift-paper.left::before { left: 0; }
+    .gift-paper.right::before { right: 0; }
+
+    .gift-ribbon {
+      position: absolute;
+      z-index: 2;
+      display: block;
+      background: var(--ink);
+      transition: transform .8s var(--ease), opacity .55s ease;
+    }
+
+    .gift-ribbon.vertical { top: 0; bottom: 0; left: calc(50% - 34px); width: 68px; }
+    .gift-ribbon.horizontal { left: 0; right: 0; top: calc(50% - 30px); height: 60px; }
+
+    .gift-button {
+      position: relative;
+      z-index: 4;
+      min-width: min(310px, calc(100% - 48px));
+      min-height: 166px;
+      display: grid;
+      place-items: center;
+      gap: 10px;
+      padding: 22px;
+      border: 1px solid var(--paper);
+      color: var(--paper);
+      background: var(--ink);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: transform .45s var(--ease), color .3s ease, background .3s ease, opacity .45s ease;
+    }
+
+    .gift-button:hover { transform: scale(1.04) rotate(-1deg); color: var(--ink); background: var(--paper); }
+
+    .gift-bow { position: relative; width: 94px; height: 54px; display: block; }
+    .gift-bow::before,
+    .gift-bow::after {
+      position: absolute;
+      top: 7px;
+      width: 43px;
+      height: 32px;
+      content: "";
+      border: 8px solid currentColor;
+      border-radius: 50% 8px 50% 8px;
+    }
+
+    .gift-bow::before { left: 1px; transform: rotate(18deg); }
+    .gift-bow::after { right: 1px; transform: scaleX(-1) rotate(18deg); }
+    .gift-button strong { font: 600 1rem/1 "Syne", sans-serif; letter-spacing: .08em; }
+    .gift-button small { color: var(--grey-2); font-size: .58rem; letter-spacing: .12em; }
+    .gift-button:hover small { color: #555; }
+
+    .terminal-gift:not(.opened):not(.arrived) .gift-paper.left { transform: translateX(-104%) rotate(-4deg); }
+    .terminal-gift:not(.opened):not(.arrived) .gift-paper.right { transform: translateX(104%) rotate(4deg); }
+    .terminal-gift:not(.opened):not(.arrived) .gift-ribbon.vertical { transform: translateY(-110%); opacity: 0; }
+    .terminal-gift:not(.opened):not(.arrived) .gift-ribbon.horizontal { transform: scaleX(0); opacity: 0; }
+    .terminal-gift:not(.opened):not(.arrived) .gift-button { transform: scale(.62) rotate(-8deg); opacity: 0; }
+
+    .terminal-gift.opened .gift-paper.left { transform: translateX(-105%) rotate(-3deg); }
+    .terminal-gift.opened .gift-paper.right { transform: translateX(105%) rotate(3deg); }
+    .terminal-gift.opened .gift-ribbon.vertical { transform: translateY(-110%); opacity: 0; }
+    .terminal-gift.opened .gift-ribbon.horizontal { transform: translateX(110%); opacity: 0; }
+    .terminal-gift.opened .gift-button { transform: scale(1.35) rotate(8deg); opacity: 0; pointer-events: none; }
+    .terminal-gift.opened .gift-wrap { pointer-events: none; }
+
     .projects {
+      position: relative;
+      min-height: 100svh;
+      overflow: hidden;
       padding: 150px 0;
       color: var(--ink);
       background: var(--paper);
     }
 
+    .projects-content { position: relative; z-index: 1; transition: opacity .9s ease, filter .9s ease; }
+    .projects:not(.unlocked) .projects-content { opacity: .13; filter: blur(9px); pointer-events: none; user-select: none; }
     .projects .section-number { color: #666; }
     .projects h2 { margin-bottom: 66px; }
 
@@ -781,6 +1477,139 @@
     .project-go { grid-column: 3; grid-row: 1 / 3; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; transition: transform .45s var(--ease); }
     .project-card:hover .project-go { transform: rotate(-45deg); }
 
+    .projects-lock-screen {
+      position: absolute;
+      z-index: 5;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      transition: visibility 0s linear 1.35s;
+    }
+
+    .vault-panel {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50.2%;
+      overflow: hidden;
+      border-color: rgba(5,5,5,.18);
+      background: var(--ink);
+      transition: transform 1.2s var(--ease) .15s;
+    }
+
+    .vault-panel::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 200%;
+      content: "";
+      background:
+        linear-gradient(rgba(5,5,5,.38), rgba(5,5,5,.74)),
+        url("assets/projects-lock-art.png") center / cover no-repeat;
+      filter: grayscale(1) contrast(1.16) brightness(.82);
+    }
+
+    .vault-panel::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .vault-panel.left { left: 0; border-right: 1px solid var(--paper); }
+    .vault-panel.right { right: 0; border-left: 1px solid var(--paper); }
+    .vault-panel.left::before { left: 0; }
+    .vault-panel.right::before { right: 0; }
+
+    .projects-lock-ui {
+      position: relative;
+      z-index: 2;
+      width: min(420px, calc(100% - 40px));
+      display: grid;
+      justify-items: center;
+      gap: 20px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,.5);
+      color: var(--paper);
+      background: rgba(5,5,5,.78);
+      box-shadow: 18px 18px 0 rgba(5,5,5,.45);
+      backdrop-filter: blur(8px);
+      text-align: center;
+      transition: transform .6s var(--ease), opacity .45s ease;
+    }
+
+    .vault-kicker { color: var(--grey-1); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; }
+
+    .vault-lock-button {
+      width: 220px;
+      min-height: 245px;
+      display: grid;
+      place-items: center;
+      gap: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,.42);
+      color: var(--paper);
+      background: rgba(5,5,5,.38);
+      cursor: pointer;
+      transition: color .3s ease, background .3s ease, transform .3s var(--ease);
+    }
+
+    .vault-lock-button:hover { color: var(--ink); background: var(--paper); transform: translateY(-5px); }
+
+    .vault-lock { position: relative; width: 124px; height: 146px; display: block; }
+
+    .vault-shackle {
+      position: absolute;
+      left: 25px;
+      top: 3px;
+      width: 74px;
+      height: 77px;
+      border: 12px solid currentColor;
+      border-bottom: 0;
+      border-radius: 38px 38px 0 0;
+      transform-origin: right bottom;
+      transition: transform .5s var(--ease);
+    }
+
+    .vault-lock-body {
+      position: absolute;
+      left: 9px;
+      bottom: 0;
+      width: 106px;
+      height: 88px;
+      display: grid;
+      place-items: center;
+      border: 4px solid currentColor;
+      background: var(--ink);
+      transition: background .3s ease;
+    }
+
+    .vault-lock-button:hover .vault-lock-body { background: var(--paper); }
+    .vault-keyhole { width: 17px; height: 38px; display: block; background: currentColor; clip-path: polygon(25% 0, 75% 0, 100% 30%, 72% 53%, 82% 100%, 18% 100%, 28% 53%, 0 30%); }
+    .vault-lock-label { font-size: .64rem; letter-spacing: .13em; text-transform: uppercase; }
+    .vault-progress { display: flex; gap: 9px; }
+    .vault-progress span { width: 28px; height: 4px; display: block; border: 1px solid currentColor; transition: background .3s ease; }
+    .projects-lock-screen[data-stage="1"] .vault-progress span:nth-child(1),
+    .projects-lock-screen[data-stage="2"] .vault-progress span:nth-child(-n+2),
+    .projects-lock-screen[data-stage="3"] .vault-progress span { background: currentColor; }
+    .projects-lock-screen[data-stage="1"] .vault-shackle { transform: translateY(-7px); }
+    .projects-lock-screen[data-stage="2"] .vault-shackle { transform: translateY(-17px) rotate(-7deg); }
+    .projects-lock-screen[data-stage="3"] .vault-shackle { transform: translate(14px, -24px) rotate(28deg); }
+    .projects-lock-screen.hit .vault-lock { animation: lock-hit .34s steps(2, end); }
+    .projects.unlocked .projects-lock-screen { visibility: hidden; pointer-events: none; }
+    .projects.unlocked .vault-panel.left { transform: translateX(-102%); }
+    .projects.unlocked .vault-panel.right { transform: translateX(102%); }
+    .projects.unlocked .projects-lock-ui { transform: scale(1.3); opacity: 0; }
+    .projects:not(.unlocked) .projects-lock-screen { visibility: visible; transition-delay: 0s; }
+    .projects:not(.unlocked) .projects-lock-screen:not(.arrived) .vault-panel.left { transform: translateX(-102%); }
+    .projects:not(.unlocked) .projects-lock-screen:not(.arrived) .vault-panel.right { transform: translateX(102%); }
+    .projects:not(.unlocked) .projects-lock-screen:not(.arrived) .projects-lock-ui { transform: scale(.58) rotate(7deg); opacity: 0; }
+
     .footer {
       position: relative;
       min-height: 74vh;
@@ -792,9 +1621,9 @@
 
     .footer-grid {
       display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: end;
-      gap: 50px;
+      grid-template-columns: minmax(0, .86fr) minmax(360px, 1.14fr);
+      align-items: center;
+      gap: clamp(42px, 6vw, 100px);
     }
 
     .footer h2 {
@@ -806,7 +1635,63 @@
 
     .footer h2 span { display: block; color: transparent; -webkit-text-stroke: 1px var(--paper); }
     .footer-note { margin: -12px 0 22px; color: var(--grey-1); font-size: .76rem; letter-spacing: .05em; }
-    .footer-icon { width: clamp(120px, 18vw, 260px); opacity: .28; filter: grayscale(1); animation: drift 7s ease-in-out infinite; }
+
+    .footer-art {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+      overflow: hidden;
+      margin: 0;
+      aspect-ratio: 16 / 9;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      box-shadow: 18px 18px 0 rgba(255,255,255,.08);
+      opacity: 0;
+      transform: translateX(90px) rotate(3deg);
+      clip-path: inset(0 0 100% 0);
+      transition: opacity .9s var(--ease), transform 1.1s var(--ease), clip-path 1.25s var(--ease);
+    }
+
+    .footer-grid.in-view .footer-art { opacity: 1; transform: translate(0) rotate(0); clip-path: inset(0); }
+
+    .footer-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.12) brightness(.88) blur(7px);
+      transform: scale(1.13);
+      transition: filter 1.1s var(--ease) .2s, transform 1.4s var(--ease) .12s;
+    }
+
+    .footer-grid.in-view .footer-art img { filter: grayscale(1) contrast(1.16) brightness(.94) blur(0); transform: scale(1); }
+
+    .footer-art::after {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px),
+        var(--ink);
+      background-size: 32px 32px;
+      transition: transform 1.2s var(--ease) .22s;
+    }
+
+    .footer-grid.in-view .footer-art::after { transform: translateX(102%); }
+
+    .footer-art-label {
+      position: absolute;
+      z-index: 3;
+      right: 14px;
+      bottom: 14px;
+      padding: 8px 11px;
+      color: var(--paper);
+      background: var(--ink);
+      font-size: .58rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
 
     .footer-bottom {
       margin-top: 100px;
@@ -841,7 +1726,18 @@
     @keyframes drift { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); } 50% { transform: translate3d(0, -24px, 0) rotate(3deg); } }
     @keyframes scroll-pulse { 0%, 100% { transform: scaleY(.25); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } }
     @keyframes intro-rise { from { opacity: 0; transform: translateY(45px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes hero-stage-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+    @keyframes hero-entry-scan {
+      0% { left: -4%; opacity: 0; transform: scaleY(0); }
+      18% { opacity: .92; transform: scaleY(1); }
+      82% { opacity: .8; transform: scaleY(1); }
+      100% { left: 104%; opacity: 0; transform: scaleY(.4); }
+    }
     @keyframes photo-reveal { from { opacity: 0; clip-path: polygon(8% 0, 100% 5%, 100% 5%, 8% 0); } to { opacity: 1; clip-path: polygon(8% 0, 100% 5%, 93% 100%, 0 94%); } }
+    @keyframes scan-lines { to { transform: translateY(20px); } }
+    @keyframes text-switch { 0% { opacity: .1; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
+    @keyframes terminal-flash { 0%, 40% { opacity: .2; } 20%, 100% { opacity: 1; } }
+    @keyframes lock-hit { 0%, 100% { transform: translateX(0); } 33% { transform: translateX(-8px) rotate(-2deg); } 66% { transform: translateX(8px) rotate(2deg); } }
 
     @media (max-width: 980px) {
       :root { --page: min(100% - 36px, 760px); }
@@ -858,6 +1754,7 @@
       .profile-content { margin-left: 10vw; }
       .games-header { grid-template-columns: 1fr; }
       .games-note { text-align: left; }
+      .terminal-body { grid-template-columns: 230px 1fr; }
       .game-row { grid-template-columns: 48px 1fr auto; }
       .game-id { grid-column: 2; }
       .game-arrow { grid-column: 3; grid-row: 1 / 3; }
@@ -866,12 +1763,27 @@
       .project-card { grid-template-columns: 45px 1fr auto; }
       .project-desc { grid-column: 2; }
       .project-go { grid-column: 3; grid-row: 1 / 3; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-art { width: min(100%, 680px); margin-left: auto; }
     }
 
     @media (max-width: 640px) {
       :root { --page: calc(100% - 28px); }
       .nav-links a:not(:last-child) { display: none; }
+      .nav-links { gap: 10px; }
+      .sound-toggle { min-width: 76px; padding-inline: 7px; }
+      .intro-title { font-size: clamp(4rem, 23vw, 7rem); }
+      .intro-controls { display: grid; }
+      .intro-enter, .intro-sound { width: min(300px, 82vw); }
       .hero-grid { padding-bottom: 40px; }
+      .hero::before {
+        opacity: .63;
+        background:
+          linear-gradient(0deg, rgba(5,5,5,.78) 0%, rgba(5,5,5,.3) 48%, rgba(5,5,5,.55) 100%),
+          url("assets/hero-background-art.png") center 30% / cover no-repeat;
+      }
+      body.site-ready .hero::before { opacity: .68; filter: grayscale(1) contrast(1.16) brightness(1); }
+      .hero-entry-door strong { font-size: clamp(3.2rem, 21vw, 5.5rem); }
       h1 { font-size: clamp(4.4rem, 23vw, 7.2rem); margin-bottom: 28px; }
       .hero-actions { display: grid; }
       .hero-visual { width: 86vw; }
@@ -885,6 +1797,15 @@
       .facts { grid-template-columns: 1fr; }
       .fact { min-height: 94px; }
       .fact small { margin-bottom: 12px; }
+      .profile-note-tabs { grid-template-columns: 1fr; }
+      .profile-note-button { min-height: 43px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .profile-note-button:last-child { border-bottom: 0; }
+      .profile.profile-locked { min-height: 100svh; padding: 0; }
+      .hatch-assembly { gap: 15px; }
+      .hatch-frame { width: min(82vw, 350px); border-width: 9px; box-shadow: inset 0 0 0 2px var(--grey-3), 0 0 0 2px var(--grey-3), 0 0 0 10px #111, 0 0 0 12px var(--grey-3); }
+      .hatch-wheel { width: min(47vw, 190px); border-width: 8px; }
+      .hatch-instruction { max-width: 310px; font-size: 1.12rem; }
+      .hatch-help { max-width: 300px; line-height: 1.5; }
       .cinematic { min-height: 76vh; }
       .cinematic-line.primary { font-size: clamp(2.7rem, 13vw, 4.3rem); }
       .cinematic-line.outline { font-size: clamp(2.45rem, 11.8vw, 3.9rem); }
@@ -903,6 +1824,18 @@
       .anime-link.reveal.from-right { transform: translateY(40px); }
       .anime-link.reveal.from-right.in-view { transform: translateY(0); }
       .anime-icon { width: 40px; height: 40px; }
+      .terminal-section { padding: 105px 0 125px; }
+      .terminal-header { display: block; }
+      .terminal-header p { margin-top: 22px; text-align: left; }
+      .terminal-shell { box-shadow: 8px 8px 0 var(--paper); }
+      .terminal-body { grid-template-columns: 1fr; }
+      .terminal-commands { grid-template-columns: repeat(2, 1fr); border-right: 0; border-bottom: 1px solid var(--line); }
+      .terminal-command { min-height: 50px; padding: 0 13px; border-right: 1px solid var(--line); font-size: .66rem; }
+      .terminal-command:hover, .terminal-command.active { padding-left: 18px; }
+      .terminal-output { min-height: 310px; padding: 28px 20px; }
+      .gift-button { min-width: min(260px, calc(100% - 38px)); min-height: 148px; }
+      .gift-ribbon.vertical { left: calc(50% - 25px); width: 50px; }
+      .gift-ribbon.horizontal { top: calc(50% - 23px); height: 46px; }
       .projects { padding: 105px 0; }
       .projects h2 { margin-bottom: 45px; }
       .archive-visual { min-height: 0; aspect-ratio: 4 / 5; }
@@ -910,19 +1843,53 @@
       .project-no { display: none; }
       .project-desc { grid-column: 1; }
       .project-go { grid-column: 2; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .footer-icon { width: 130px; margin-left: auto; }
+      .vault-lock-button { width: 200px; min-height: 230px; }
+      .footer-art { box-shadow: 9px 9px 0 rgba(255,255,255,.08); }
       .footer-bottom { flex-direction: column; margin-top: 70px; }
+      .icon-divider-loop, .icon-divider-item { gap: 22px; }
+      .icon-divider-loop { padding-right: 22px; }
+      .icon-divider-item img { width: 44px; height: 44px; }
+    }
+
+    @media (pointer: fine) {
+      html, body { cursor: url("assets/cursor-pixel.svg") 2 2, auto; }
+      a,
+      a *,
+      button,
+      button *,
+      [role="button"],
+      [role="button"] * { cursor: url("assets/cursor-select.svg") 12 3, pointer !important; }
+      button:disabled,
+      button:disabled * { cursor: wait !important; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       .reveal, .stagger > * { opacity: 1; transform: none; }
+      .hero-entry-doors { display: none; }
     }
   </style>
 </head>
-<body>
+<body class="intro-active">
+  <div class="intro-screen" id="intro-screen" role="dialog" aria-modal="true" aria-label="Enter Veikuno portfolio">
+    <div class="intro-panel left" aria-hidden="true"></div>
+    <div class="intro-panel right" aria-hidden="true"></div>
+    <div class="intro-inner">
+      <div class="intro-code">VK_OS / Portfolio interface / Sydney</div>
+      <div class="intro-title" aria-label="Veikuno">VEI<span>KUNO</span></div>
+      <div class="intro-progress">
+        <div class="intro-progress-meta"><span id="intro-status">Loading visual system</span><span id="intro-percent">000%</span></div>
+        <div class="intro-progress-track"><div class="intro-progress-bar" id="intro-progress-bar"></div></div>
+      </div>
+      <div class="intro-controls">
+        <button class="intro-enter" id="intro-enter" type="button" disabled>Enter portfolio</button>
+        <button class="intro-sound" id="intro-sound" type="button" aria-pressed="true">Sound / On</button>
+      </div>
+    </div>
+  </div>
+  <noscript><style>body.intro-active{overflow:auto}.intro-screen,.hero-entry-doors{display:none}.hero-grid{opacity:1!important;transform:none!important}</style></noscript>
+
   <div class="scroll-progress" aria-hidden="true"></div>
 
   <nav class="site-nav" aria-label="Primary navigation">
@@ -930,13 +1897,19 @@
     <div class="nav-links">
       <a href="#profile">Profile</a>
       <a href="#games">Games</a>
-      <a href="#projects">Projects</a>
+      <a href="#terminal">Terminal</a>
+      <a href="#projects">Profiles</a>
       <a href="https://www.instagram.com/veikuno/" target="_blank" rel="noreferrer">Instagram ↗</a>
+      <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="true">Sound / On</button>
     </div>
   </nav>
 
   <main id="top">
     <header class="hero">
+      <div class="hero-entry-doors" aria-hidden="true">
+        <span class="hero-entry-door left"><strong>VEI</strong></span>
+        <span class="hero-entry-door right"><strong>KUNO</strong></span>
+      </div>
       <div class="page hero-grid">
         <div class="hero-copy">
           <p class="kicker">Developer · Gamer · Drummer · Photographer</p>
@@ -951,7 +1924,7 @@
           </div>
         </div>
 
-        <div class="hero-visual" data-parallax="-.06">
+        <div class="hero-visual" data-parallax="-.06" data-tilt="4">
           <img class="hero-photo" src="assets/portrait-floating.jpg" alt="Monochrome illustrated character floating in darkness">
           <span class="hero-index">PORTRAIT / 001</span>
         </div>
@@ -970,10 +1943,10 @@
       </div>
     </div>
 
-    <section class="profile" id="profile">
-      <div class="page profile-grid">
+    <section class="profile profile-locked" id="profile">
+      <div class="page profile-grid" id="profile-content" inert aria-hidden="true">
         <div class="profile-visual reveal from-left">
-          <div class="profile-photo-shell" data-parallax="-.04">
+          <div class="profile-photo-shell" data-parallax="-.04" data-tilt="3">
             <img class="profile-photo" src="assets/portrait-seated.jpg" alt="Monochrome illustrated character seated among abstract shapes" loading="lazy">
             <div class="profile-stamp" aria-hidden="true"><img src="assets/icon-chat.png" alt=""></div>
           </div>
@@ -991,9 +1964,46 @@
             <div class="fact"><small>Languages</small><span>Python, C++, C#, HTML, CSS, JavaScript, Java, SQL, and more</span></div>
             <div class="fact"><small>Uni</small><span>University of Technology Sydney (UTS)</span></div>
           </div>
+          <div class="profile-notes reveal">
+            <div class="profile-note-tabs" role="group" aria-label="Reveal more about Leo">
+              <button class="profile-note-button" type="button" data-note="availability">Availability</button>
+              <button class="profile-note-button" type="button" data-note="hobbies">Hobbies</button>
+              <button class="profile-note-button" type="button" data-note="connect">Say hello</button>
+            </div>
+            <div class="profile-note-output" aria-live="polite">
+              <span class="profile-note-label">Select a file</span>
+              <p class="profile-note-text">Choose a button to reveal more.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="profile-hatch" id="profile-hatch" data-stage="0">
+        <span class="hatch-panel left" aria-hidden="true"></span>
+        <span class="hatch-panel right" aria-hidden="true"></span>
+        <div class="hatch-assembly">
+          <span class="hatch-kicker">Pressure hatch / Profile access</span>
+          <div class="hatch-frame" id="hatch-frame">
+            <span class="hatch-bolt" aria-hidden="true"></span><span class="hatch-bolt" aria-hidden="true"></span>
+            <span class="hatch-bolt" aria-hidden="true"></span><span class="hatch-bolt" aria-hidden="true"></span>
+            <span class="hatch-bolt" aria-hidden="true"></span><span class="hatch-bolt" aria-hidden="true"></span>
+            <span class="hatch-bolt" aria-hidden="true"></span><span class="hatch-bolt" aria-hidden="true"></span>
+            <button class="hatch-wheel" id="hatch-wheel" type="button" aria-controls="profile-content" aria-expanded="false" aria-label="Spin the wheel to open the profile hatch.">
+              <span class="hatch-spoke" aria-hidden="true"></span><span class="hatch-spoke" aria-hidden="true"></span>
+              <span class="hatch-spoke" aria-hidden="true"></span><span class="hatch-spoke" aria-hidden="true"></span>
+              <span class="hatch-spoke" aria-hidden="true"></span><span class="hatch-spoke" aria-hidden="true"></span>
+            </button>
+          </div>
+          <p class="hatch-instruction">Spin the wheel to open the hatch</p>
+          <p class="hatch-help">Drag the wheel with your mouse or finger. You can also tap it three times.</p>
+          <span class="hatch-status" id="hatch-status" aria-live="polite">Pressure seal engaged</span>
+          <span class="hatch-progress" aria-hidden="true"><span></span><span></span><span></span></span>
         </div>
       </div>
     </section>
+
+    <div class="icon-divider" aria-hidden="true" data-divider-icons="creature,globe,chat,profile,creature,chat,globe,profile">
+      <div class="icon-divider-track"></div>
+    </div>
 
     <section class="cinematic scene-reveal" aria-label="Games and connections">
       <img class="cinematic-image" src="assets/portrait-bath.jpg" alt="Monochrome cinematic illustration" loading="lazy" data-parallax=".10">
@@ -1015,7 +2025,7 @@
           <p class="games-note">Select any row to copy the ID to your clipboard.</p>
         </div>
 
-        <div class="player-stage stagger">
+        <div class="player-stage stagger" data-tilt="1.2">
           <img class="player-art" src="assets/player-index-art.png" alt="Monochrome winged character artwork" loading="lazy">
           <div class="game-list" id="player-list" inert>
             <button class="game-row" type="button" data-copy="804085448" aria-label="Copy Genshin Impact UID 804085448">
@@ -1046,54 +2056,130 @@
       </div>
     </section>
 
-    <section class="projects" id="projects">
+    <div class="icon-divider reverse" aria-hidden="true" data-divider-icons="globe,creature,profile,chat,globe,chat,creature,profile">
+      <div class="icon-divider-track"></div>
+    </div>
+
+    <section class="terminal-section" id="terminal">
       <div class="page">
+        <div class="terminal-header reveal">
+          <div>
+            <span class="section-number">03 / Connection terminal</span>
+            <h2>Choose a<br>channel.</h2>
+          </div>
+          <p>Run a command to reveal a profile, social link, or player ID.</p>
+        </div>
+
+        <div class="terminal-gift reveal" id="terminal-gift">
+          <div class="terminal-shell" id="terminal-shell" inert aria-hidden="true">
+            <div class="terminal-bar">
+              <span>visitor@veikuno:~</span>
+              <span class="terminal-lights" aria-hidden="true"><span></span><span></span><span></span></span>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-commands" role="group" aria-label="Terminal commands">
+                <button class="terminal-command" type="button" data-command="instagram">&gt; instagram</button>
+                <button class="terminal-command" type="button" data-command="discord">&gt; discord</button>
+                <button class="terminal-command" type="button" data-command="github">&gt; github</button>
+                <button class="terminal-command" type="button" data-command="myanimelist">&gt; myanimelist</button>
+                <button class="terminal-command" type="button" data-command="player_ids">&gt; player_ids</button>
+              </div>
+              <div class="terminal-output" id="terminal-output" data-scene="ready" aria-live="polite">
+                <span class="terminal-prompt">visitor@veikuno:~$ awaiting command</span>
+                <strong class="terminal-result-title">Connection ready.</strong>
+                <p class="terminal-result-copy">Select a command from the menu to begin.</p>
+              </div>
+            </div>
+          </div>
+          <div class="gift-wrap" id="gift-wrap">
+            <span class="gift-paper left" aria-hidden="true"></span>
+            <span class="gift-paper right" aria-hidden="true"></span>
+            <span class="gift-ribbon vertical" aria-hidden="true"></span>
+            <span class="gift-ribbon horizontal" aria-hidden="true"></span>
+            <button class="gift-button" id="gift-button" type="button" aria-controls="terminal-shell" aria-expanded="false">
+              <span class="gift-bow" aria-hidden="true"></span>
+              <strong>Unwrap terminal</strong>
+              <small>One gift waiting</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="icon-divider" aria-hidden="true" data-divider-icons="chat,profile,creature,globe,chat,globe,profile,creature">
+      <div class="icon-divider-track"></div>
+    </div>
+
+    <section class="projects" id="projects">
+      <div class="page projects-content" id="projects-content" inert aria-hidden="true">
         <div class="reveal">
-          <span class="section-number">03 / Selected archive</span>
-          <h2>Other<br>projects.</h2>
+          <span class="section-number">04 / Profile archive</span>
+          <h2>Other<br>profiles.</h2>
         </div>
 
         <div class="archive-layout">
           <figure class="archive-visual reveal from-left">
             <img src="assets/archive-art.png" alt="Monochrome winged character standing beside a city fence" loading="lazy">
-            <figcaption class="archive-caption">Archive visual / 002</figcaption>
+            <figcaption class="archive-caption">Profile archive / 002</figcaption>
           </figure>
 
           <div class="project-list stagger">
-            <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
+            <a class="project-card" href="https://akasha.cv/profile/804085448?build=1075343a5747f0758aae8d79fe0a061a" target="_blank" rel="noreferrer">
               <span class="project-no">001</span>
-              <span class="project-title">Neon Collector</span>
-              <span class="project-desc">A fast Unity arcade challenge - collect the glowing orbs, avoid the chaser, beat the clock.</span>
+              <span class="project-title">Akasha.cv</span>
+              <span class="project-desc">My Genshin Impact character builds, artifacts, weapons, and showcase statistics.</span>
               <span class="project-go">↗</span>
             </a>
-            <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
+            <a class="project-card" href="https://steamcommunity.com/id/veikuno/" target="_blank" rel="noreferrer">
               <span class="project-no">002</span>
-              <span class="project-title">Unity Lab</span>
-              <span class="project-desc">Small game mechanics, experiments, and ideas built while learning through practice.</span>
+              <span class="project-title">Steam Profile</span>
+              <span class="project-desc">My Steam library, game activity, achievements, and community profile.</span>
               <span class="project-go">↗</span>
             </a>
             <a class="project-card" href="https://github.com/veikuno" target="_blank" rel="noreferrer">
               <span class="project-no">003</span>
-              <span class="project-title">GitHub Archive</span>
-              <span class="project-desc">The full collection of code, works in progress, and whatever comes next.</span>
+              <span class="project-title">GitHub Profile</span>
+              <span class="project-desc">Code, experiments, game development work, and future projects.</span>
               <span class="project-go">↗</span>
             </a>
           </div>
         </div>
       </div>
+      <div class="projects-lock-screen" id="projects-lock-screen" data-stage="0">
+        <span class="vault-panel left" aria-hidden="true"></span>
+        <span class="vault-panel right" aria-hidden="true"></span>
+        <div class="projects-lock-ui">
+          <span class="vault-kicker">Secured profiles / Three-step access</span>
+          <button class="vault-lock-button" id="vault-lock-button" type="button" aria-controls="projects-content" aria-expanded="false" aria-label="Locked profiles. Three clicks remaining.">
+            <span class="vault-lock" aria-hidden="true">
+              <span class="vault-shackle"></span>
+              <span class="vault-lock-body"><span class="vault-keyhole"></span></span>
+            </span>
+            <span class="vault-lock-label" id="vault-lock-label">Click lock / 3 remaining</span>
+          </button>
+          <span class="vault-progress" aria-hidden="true"><span></span><span></span><span></span></span>
+        </div>
+      </div>
     </section>
+
+    <div class="icon-divider reverse" aria-hidden="true" data-divider-icons="profile,globe,creature,chat,profile,creature,chat,globe">
+      <div class="icon-divider-track"></div>
+    </div>
   </main>
 
-  <footer class="footer">
+  <footer class="footer" id="footer">
     <div class="page">
-      <div class="footer-grid">
+      <div class="footer-grid scene-reveal">
         <div class="reveal">
-          <span class="section-number">04 / Stay connected</span>
+          <span class="section-number">05 / Stay connected</span>
           <h2>See you<span>next time.</span></h2>
           <p class="footer-note">Follow if you want to be moots!</p>
           <a class="button primary" href="https://www.instagram.com/veikuno/" target="_blank" rel="noreferrer">@veikuno on Instagram <span class="arrow">↗</span></a>
         </div>
-        <img class="footer-icon" src="assets/icon-globe.png" alt="Pixel globe" loading="lazy">
+        <figure class="footer-art">
+          <img src="assets/footer-goodbye-art.png" alt="Monochrome close-up illustration of two characters" loading="lazy">
+          <figcaption class="footer-art-label">End transmission / 005</figcaption>
+        </figure>
       </div>
       <div class="footer-bottom">
         <span>© <span id="year"></span> Veikuno</span>
@@ -1106,13 +2192,410 @@
 
   <script>
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
     const progress = document.querySelector('.scroll-progress');
     const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
     const playerStage = document.querySelector('.player-stage');
     const playerCurtain = document.querySelector('.player-curtain');
     const playerList = document.getElementById('player-list');
+    const copyMessage = document.querySelector('.copy-message');
+    const introScreen = document.getElementById('intro-screen');
+    const introEnter = document.getElementById('intro-enter');
+    const introSound = document.getElementById('intro-sound');
+    const soundToggle = document.getElementById('sound-toggle');
+    const introProgressBar = document.getElementById('intro-progress-bar');
+    const introPercent = document.getElementById('intro-percent');
+    const introStatus = document.getElementById('intro-status');
+    const profileSection = document.getElementById('profile');
+    const profileContent = document.getElementById('profile-content');
+    const profileHatch = document.getElementById('profile-hatch');
+    const hatchFrame = document.getElementById('hatch-frame');
+    const hatchWheel = document.getElementById('hatch-wheel');
+    const hatchStatus = document.getElementById('hatch-status');
+    const terminalGift = document.getElementById('terminal-gift');
+    const terminalShell = document.getElementById('terminal-shell');
+    const giftButton = document.getElementById('gift-button');
+    const projectsSection = document.getElementById('projects');
+    const projectsContent = document.getElementById('projects-content');
+    const projectsLockScreen = document.getElementById('projects-lock-screen');
+    const vaultLockButton = document.getElementById('vault-lock-button');
+    const vaultLockLabel = document.getElementById('vault-lock-label');
+    const introContent = [...document.querySelectorAll('.site-nav, main, .footer')];
 
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    const dividerIcons = {
+      creature: 'assets/icon-creature.png',
+      globe: 'assets/icon-globe.png',
+      chat: 'assets/icon-chat.png',
+      profile: 'assets/icon-profile.png'
+    };
+
+    document.querySelectorAll('[data-divider-icons]').forEach((divider) => {
+      const track = divider.querySelector('.icon-divider-track');
+      const order = divider.dataset.dividerIcons.split(',');
+      for (let repeat = 0; repeat < 2; repeat += 1) {
+        const loop = document.createElement('div');
+        loop.className = 'icon-divider-loop';
+        order.forEach((name) => {
+          const item = document.createElement('span');
+          const icon = document.createElement('img');
+          item.className = 'icon-divider-item';
+          icon.src = dividerIcons[name];
+          icon.alt = '';
+          item.appendChild(icon);
+          loop.appendChild(item);
+        });
+        track.appendChild(loop);
+      }
+    });
+
+    introContent.forEach((element) => {
+      element.setAttribute('inert', '');
+      element.setAttribute('aria-hidden', 'true');
+    });
+
+    let soundEnabled = true;
+    let audioContext;
+    let copyTimer;
+
+    const getAudioContext = () => {
+      if (!soundEnabled) return null;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      if (!audioContext) audioContext = new AudioContextClass();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      return audioContext;
+    };
+
+    const tone = (frequency, duration = .08, type = 'sine', volume = .025, delay = 0) => {
+      const context = getAudioContext();
+      if (!context) return;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = context.currentTime + delay;
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + .012);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + .03);
+    };
+
+    const playSound = (name) => {
+      if (!soundEnabled) return;
+      if (name === 'enter') {
+        tone(196, .5, 'sine', .035);
+        tone(293.66, .52, 'sine', .028, .08);
+        tone(440, .58, 'sine', .023, .16);
+      } else if (name === 'door') {
+        tone(110, .38, 'sawtooth', .025);
+        tone(220, .34, 'triangle', .022, .1);
+      } else if (name === 'terminal') {
+        tone(220, .07, 'square', .018);
+        tone(660, .12, 'triangle', .02, .065);
+      } else if (name === 'copy') {
+        tone(880, .1, 'sine', .022);
+        tone(1174.66, .14, 'sine', .018, .06);
+      } else if (name === 'reveal') {
+        tone(330, .09, 'triangle', .018);
+        tone(494, .13, 'triangle', .014, .05);
+      } else if (name === 'hover') {
+        tone(720, .04, 'square', .007);
+      } else if (name === 'gift') {
+        tone(523.25, .18, 'triangle', .02);
+        tone(659.25, .2, 'triangle', .018, .07);
+        tone(783.99, .26, 'triangle', .016, .14);
+      } else if (name === 'lock') {
+        tone(145, .11, 'square', .018);
+        tone(190, .08, 'square', .012, .06);
+      } else if (name === 'unlock') {
+        tone(220, .17, 'triangle', .021);
+        tone(329.63, .22, 'triangle', .018, .08);
+        tone(440, .3, 'sine', .018, .16);
+      } else if (name === 'wheel') {
+        tone(105, .09, 'square', .015);
+        tone(157, .07, 'triangle', .012, .045);
+      } else if (name === 'hatch') {
+        tone(72, .55, 'sawtooth', .024);
+        tone(108, .5, 'triangle', .018, .12);
+        tone(216, .35, 'sine', .014, .28);
+      } else {
+        tone(440, .065, 'square', .014);
+      }
+    };
+
+    const updateSoundControls = () => {
+      const text = soundEnabled ? 'Sound / On' : 'Sound / Off';
+      introSound.textContent = text;
+      introSound.setAttribute('aria-pressed', String(soundEnabled));
+      soundToggle.textContent = text;
+      soundToggle.setAttribute('aria-pressed', String(soundEnabled));
+    };
+
+    const toggleSound = () => {
+      if (soundEnabled) {
+        playSound('click');
+        soundEnabled = false;
+      } else {
+        soundEnabled = true;
+        playSound('reveal');
+      }
+      updateSoundControls();
+    };
+
+    introSound.addEventListener('click', toggleSound);
+    soundToggle.addEventListener('click', toggleSound);
+    updateSoundControls();
+
+    document.addEventListener('pointerover', (event) => {
+      if (event.pointerType === 'touch') return;
+      const control = event.target.closest('button, a, [role="button"]');
+      if (!control || control.contains(event.relatedTarget)) return;
+      playSound('hover');
+    });
+
+    const hatchTarget = 540;
+    const hatchMessages = ['Pressure seal engaged', 'Inner seal released', 'Outer bolts released', 'Hatch unlocked'];
+    let hatchTravel = 0;
+    let hatchVisualAngle = 0;
+    let hatchLastPointerAngle = 0;
+    let hatchDragging = false;
+    let hatchDragged = false;
+    let hatchIgnoreClick = false;
+    let hatchOpening = false;
+    let hatchWasVisible = false;
+    let hatchOpenTimer;
+
+    const pointerAngle = (event) => {
+      const rect = hatchWheel.getBoundingClientRect();
+      return Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
+    };
+
+    const updateHatch = () => {
+      const progressAmount = Math.min(1, hatchTravel / hatchTarget);
+      const stage = Math.min(3, Math.floor(progressAmount * 3 + .001));
+      hatchWheel.style.setProperty('--wheel-angle', `${hatchVisualAngle}deg`);
+      hatchFrame.style.setProperty('--hatch-progress', `${progressAmount * 360}deg`);
+      profileHatch.dataset.stage = String(stage);
+      hatchStatus.textContent = hatchMessages[stage];
+      hatchWheel.setAttribute('aria-label', stage === 3 ? 'Profile hatch unlocked.' : `Spin the wheel to open the profile hatch. ${3 - stage} stages remaining.`);
+
+      if (stage === 3 && !hatchOpening) {
+        hatchOpening = true;
+        profileHatch.classList.add('opening');
+        hatchWheel.setAttribute('aria-expanded', 'true');
+        playSound('hatch');
+        hatchOpenTimer = setTimeout(() => {
+          profileSection.classList.remove('profile-locked');
+          profileSection.classList.add('hatch-open');
+          profileContent.removeAttribute('inert');
+          profileContent.removeAttribute('aria-hidden');
+        }, reducedMotion ? 40 : 950);
+      }
+    };
+
+    const turnHatch = (travelDelta, visualDelta = travelDelta) => {
+      if (hatchOpening) return;
+      hatchTravel = Math.min(hatchTarget, hatchTravel + Math.abs(travelDelta));
+      hatchVisualAngle += visualDelta;
+      updateHatch();
+    };
+
+    const resetHatch = () => {
+      clearTimeout(hatchOpenTimer);
+      hatchTravel = 0;
+      hatchVisualAngle = 0;
+      hatchDragging = false;
+      hatchDragged = false;
+      hatchIgnoreClick = false;
+      hatchOpening = false;
+      profileSection.classList.add('profile-locked');
+      profileSection.classList.remove('hatch-open');
+      profileHatch.classList.remove('opening');
+      profileContent.setAttribute('inert', '');
+      profileContent.setAttribute('aria-hidden', 'true');
+      hatchWheel.setAttribute('aria-expanded', 'false');
+      updateHatch();
+    };
+
+    hatchWheel.addEventListener('pointerdown', (event) => {
+      if (hatchOpening) return;
+      hatchDragging = true;
+      hatchDragged = false;
+      hatchLastPointerAngle = pointerAngle(event);
+      hatchWheel.setPointerCapture(event.pointerId);
+      playSound('wheel');
+    });
+
+    hatchWheel.addEventListener('pointermove', (event) => {
+      if (!hatchDragging || hatchOpening) return;
+      const angle = pointerAngle(event);
+      let delta = angle - hatchLastPointerAngle;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      hatchLastPointerAngle = angle;
+      if (Math.abs(delta) < .4) return;
+      hatchDragged = true;
+      turnHatch(delta, delta);
+    });
+
+    const stopHatchDrag = (event) => {
+      if (!hatchDragging) return;
+      hatchDragging = false;
+      if (hatchWheel.hasPointerCapture(event.pointerId)) hatchWheel.releasePointerCapture(event.pointerId);
+      if (hatchDragged) {
+        hatchIgnoreClick = true;
+        setTimeout(() => { hatchIgnoreClick = false; }, 0);
+      }
+    };
+
+    hatchWheel.addEventListener('pointerup', stopHatchDrag);
+    hatchWheel.addEventListener('pointercancel', stopHatchDrag);
+    hatchWheel.addEventListener('click', () => {
+      if (hatchIgnoreClick || hatchOpening) return;
+      turnHatch(180, 180);
+    });
+
+    const hatchObserver = new IntersectionObserver(([entry]) => {
+      if (entry.intersectionRatio >= .08) {
+        profileHatch.classList.add('arrived');
+        hatchWasVisible = true;
+      } else if (hatchWasVisible) {
+        resetHatch();
+        profileHatch.classList.remove('arrived');
+        hatchWasVisible = false;
+      }
+    }, { threshold: .08 });
+
+    hatchObserver.observe(profileSection);
+
+    let giftOpenTimer;
+    let giftWasVisible = false;
+
+    const resetTerminalGift = () => {
+      clearTimeout(giftOpenTimer);
+      terminalGift.classList.remove('opened');
+      giftButton.setAttribute('aria-expanded', 'false');
+      terminalShell.setAttribute('inert', '');
+      terminalShell.setAttribute('aria-hidden', 'true');
+      document.querySelectorAll('.terminal-command').forEach((button) => button.classList.remove('active'));
+      const output = document.getElementById('terminal-output');
+      output.classList.remove('switching');
+      output.dataset.scene = 'ready';
+      output.innerHTML = '<span class="terminal-prompt">visitor@veikuno:~$ awaiting command</span><strong class="terminal-result-title">Connection ready.</strong><p class="terminal-result-copy">Select a command from the menu to begin.</p>';
+    };
+
+    giftButton.addEventListener('click', () => {
+      if (terminalGift.classList.contains('opened')) return;
+      playSound('gift');
+      terminalGift.classList.add('opened');
+      giftButton.setAttribute('aria-expanded', 'true');
+      giftOpenTimer = setTimeout(() => {
+        terminalShell.removeAttribute('inert');
+        terminalShell.removeAttribute('aria-hidden');
+      }, reducedMotion ? 40 : 1050);
+    });
+
+    let lockStage = 0;
+    let projectUnlockTimer;
+    let projectsWereVisible = false;
+
+    const resetProjectLock = () => {
+      clearTimeout(projectUnlockTimer);
+      lockStage = 0;
+      projectsSection.classList.remove('unlocked');
+      projectsLockScreen.dataset.stage = '0';
+      projectsLockScreen.classList.remove('hit');
+      vaultLockLabel.textContent = 'Click lock / 3 remaining';
+      vaultLockButton.setAttribute('aria-expanded', 'false');
+      vaultLockButton.setAttribute('aria-label', 'Locked profiles. Three clicks remaining.');
+      projectsContent.setAttribute('inert', '');
+      projectsContent.setAttribute('aria-hidden', 'true');
+    };
+
+    vaultLockButton.addEventListener('click', () => {
+      if (lockStage >= 3) return;
+      lockStage += 1;
+      const remaining = 3 - lockStage;
+      projectsLockScreen.dataset.stage = String(lockStage);
+      projectsLockScreen.classList.remove('hit');
+      void projectsLockScreen.offsetWidth;
+      projectsLockScreen.classList.add('hit');
+      vaultLockLabel.textContent = remaining ? `Click lock / ${remaining} remaining` : 'Profiles unlocked';
+      vaultLockButton.setAttribute('aria-label', remaining ? `Locked profiles. ${remaining} ${remaining === 1 ? 'click' : 'clicks'} remaining.` : 'Profiles unlocked.');
+      playSound(lockStage === 3 ? 'unlock' : 'lock');
+
+      if (lockStage === 3) {
+        vaultLockButton.setAttribute('aria-expanded', 'true');
+        projectUnlockTimer = setTimeout(() => {
+          projectsSection.classList.add('unlocked');
+          projectsContent.removeAttribute('inert');
+          projectsContent.removeAttribute('aria-hidden');
+        }, reducedMotion ? 40 : 650);
+      }
+    });
+
+    const terminalResetObserver = new IntersectionObserver(([entry]) => {
+      if (entry.intersectionRatio >= .08) {
+        terminalGift.classList.add('arrived');
+        giftWasVisible = true;
+      } else if (giftWasVisible) {
+        resetTerminalGift();
+        terminalGift.classList.remove('arrived');
+        giftWasVisible = false;
+      }
+    }, { threshold: .08 });
+
+    const projectsResetObserver = new IntersectionObserver(([entry]) => {
+      if (entry.intersectionRatio >= .08) {
+        projectsLockScreen.classList.add('arrived');
+        projectsWereVisible = true;
+      } else if (projectsWereVisible) {
+        resetProjectLock();
+        projectsLockScreen.classList.remove('arrived');
+        projectsWereVisible = false;
+      }
+    }, { threshold: .08 });
+
+    terminalResetObserver.observe(document.getElementById('terminal'));
+    projectsResetObserver.observe(projectsSection);
+
+    let bootProgress = 0;
+    const bootSteps = ['Loading visual system', 'Mapping interactions', 'Connecting audio', 'Interface ready'];
+    const bootTimer = setInterval(() => {
+      bootProgress = Math.min(100, bootProgress + (reducedMotion ? 25 : Math.ceil(Math.random() * 9) + 4));
+      introProgressBar.style.transform = `scaleX(${bootProgress / 100})`;
+      introPercent.textContent = `${String(bootProgress).padStart(3, '0')}%`;
+      introStatus.textContent = bootSteps[Math.min(3, Math.floor(bootProgress / 30))];
+      if (bootProgress === 100) {
+        clearInterval(bootTimer);
+        introEnter.disabled = false;
+      }
+    }, reducedMotion ? 30 : 75);
+
+    introEnter.addEventListener('click', () => {
+      getAudioContext();
+      playSound('enter');
+      introScreen.classList.add('leaving');
+      setTimeout(() => {
+        document.body.classList.add('hero-door-opening');
+        playSound('door');
+      }, reducedMotion ? 0 : 1320);
+      setTimeout(() => document.body.classList.add('site-ready'), reducedMotion ? 0 : 1540);
+      setTimeout(() => {
+        introScreen.classList.add('done');
+        introScreen.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('intro-active');
+        introContent.forEach((element) => {
+          element.removeAttribute('inert');
+          element.removeAttribute('aria-hidden');
+        });
+      }, reducedMotion ? 40 : 1400);
+    });
 
     const resetPlayerCurtain = () => {
       playerStage.classList.remove('open');
@@ -1163,35 +2646,130 @@
       progress.style.display = 'none';
     }
 
-    const copyMessage = document.querySelector('.copy-message');
-    let copyTimer;
+    if (!reducedMotion && finePointer) {
+      document.querySelectorAll('[data-tilt]').forEach((element) => {
+        const strength = Number(element.dataset.tilt || 3);
+        element.addEventListener('pointermove', (event) => {
+          const rect = element.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          element.style.transform = `perspective(900px) rotateX(${-y * strength}deg) rotateY(${x * strength}deg)`;
+        });
+        element.addEventListener('pointerleave', () => {
+          element.style.transform = '';
+        });
+      });
+    }
+
+    const copyValue = async (value) => {
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        const input = document.createElement('textarea');
+        input.value = value;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+      playSound('copy');
+      copyMessage.textContent = `${value} copied`;
+      copyMessage.classList.add('visible');
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => copyMessage.classList.remove('visible'), 1800);
+    };
 
     playerCurtain.addEventListener('click', () => {
+      playSound('door');
       playerStage.classList.add('open');
       playerCurtain.setAttribute('aria-expanded', 'true');
       playerList.removeAttribute('inert');
     });
 
     document.querySelectorAll('[data-copy]').forEach((button) => {
-      button.addEventListener('click', async () => {
-        const value = button.dataset.copy;
-        try {
-          await navigator.clipboard.writeText(value);
-        } catch {
-          const input = document.createElement('textarea');
-          input.value = value;
-          input.style.position = 'fixed';
-          input.style.opacity = '0';
-          document.body.appendChild(input);
-          input.select();
-          document.execCommand('copy');
-          input.remove();
-        }
-        copyMessage.textContent = `${value} copied`;
-        copyMessage.classList.add('visible');
-        clearTimeout(copyTimer);
-        copyTimer = setTimeout(() => copyMessage.classList.remove('visible'), 1800);
+      button.addEventListener('click', () => copyValue(button.dataset.copy));
+    });
+
+    const noteContent = {
+      availability: {
+        label: 'File 01 / Availability',
+        text: 'I have uni on Wednesdays and Fridays, and I am usually busy in the evenings.'
+      },
+      hobbies: {
+        label: 'File 02 / Hobbies',
+        text: 'My hobbies include drumming, photography, watching anime, cosplaying, calisthenics, and playing games.'
+      },
+      connect: {
+        label: 'File 03 / Say hello',
+        text: 'I am always happy to meet people with similar interests. Instagram is the easiest place to find me and become mutuals.'
+      }
+    };
+
+    const noteOutput = document.querySelector('.profile-note-output');
+    document.querySelectorAll('.profile-note-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        const content = noteContent[button.dataset.note];
+        document.querySelectorAll('.profile-note-button').forEach((item) => item.classList.toggle('active', item === button));
+        noteOutput.querySelector('.profile-note-label').textContent = content.label;
+        noteOutput.querySelector('.profile-note-text').textContent = content.text;
+        noteOutput.classList.remove('switching');
+        requestAnimationFrame(() => noteOutput.classList.add('switching'));
+        playSound('reveal');
       });
+    });
+
+    const terminalOutput = document.getElementById('terminal-output');
+    const terminalContent = {
+      instagram: {
+        title: 'Instagram / @veikuno',
+        copy: 'Photos, updates, and the easiest place to become mutuals.',
+        action: '<a class="terminal-action" href="https://www.instagram.com/veikuno/" target="_blank" rel="noreferrer">Open Instagram ↗</a>'
+      },
+      discord: {
+        title: 'Discord / veikuno',
+        copy: 'My Discord username is veikuno. Use the button below to copy it.',
+        action: '<button class="terminal-action" type="button" data-terminal-copy="veikuno">Copy Discord username</button>'
+      },
+      github: {
+        title: 'GitHub / veikuno',
+        copy: 'Code, experiments, game development work, and future projects.',
+        action: '<a class="terminal-action" href="https://github.com/veikuno" target="_blank" rel="noreferrer">Open GitHub ↗</a>'
+      },
+      myanimelist: {
+        title: 'MyAnimeList / veikuno',
+        copy: 'My anime profile, watch history, ratings, and current list.',
+        action: '<a class="terminal-action" href="https://myanimelist.net/profile/veikuno" target="_blank" rel="noreferrer">Open MyAnimeList ↗</a>'
+      },
+      player_ids: {
+        title: 'Player IDs / Copy channel',
+        copy: 'Select any ID below to copy it directly.',
+        action: '<div class="terminal-id-grid"><button class="terminal-action" type="button" data-terminal-copy="804085448">Genshin / 804085448</button><button class="terminal-action" type="button" data-terminal-copy="800392729">HSR / 800392729</button><button class="terminal-action" type="button" data-terminal-copy="vei#kuno">Riot / vei#kuno</button><button class="terminal-action" type="button" data-terminal-copy="vei#11205">Battle.net / vei#11205</button></div>'
+      }
+    };
+
+    document.querySelectorAll('.terminal-command').forEach((button) => {
+      button.addEventListener('click', () => {
+        const command = button.dataset.command;
+        const content = terminalContent[command];
+        document.querySelectorAll('.terminal-command').forEach((item) => item.classList.toggle('active', item === button));
+        terminalOutput.classList.remove('switching');
+        terminalOutput.dataset.scene = command;
+        terminalOutput.innerHTML = `<span class="terminal-prompt">visitor@veikuno:~$ ${command}</span><strong class="terminal-result-title">${content.title}</strong><p class="terminal-result-copy">${content.copy}</p>${content.action}`;
+        requestAnimationFrame(() => terminalOutput.classList.add('switching'));
+        playSound('terminal');
+      });
+    });
+
+    terminalOutput.addEventListener('click', (event) => {
+      const copyButton = event.target.closest('[data-terminal-copy]');
+      if (copyButton) copyValue(copyButton.dataset.terminalCopy);
+      if (event.target.closest('a')) playSound('click');
+    });
+
+    document.querySelectorAll('.site-nav a, .hero-actions a, .project-card, .anime-link, .footer a').forEach((element) => {
+      element.addEventListener('click', () => playSound('click'));
     });
   </script>
 </body>

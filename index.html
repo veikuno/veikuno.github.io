@@ -350,6 +350,117 @@
     .back-to-top span { font-size: .56rem; letter-spacing: .12em; }
     .back-to-top strong { font: 400 1.35rem/1 "DM Mono", monospace; }
 
+    .music-control {
+      position: fixed;
+      z-index: 106;
+      right: 108px;
+      bottom: 24px;
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      color: var(--paper);
+    }
+
+    .music-control.site-music-waiting {
+      opacity: 0;
+      transform: translateY(24px) scale(.82);
+      pointer-events: none;
+    }
+
+    .music-toggle {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--paper);
+      color: var(--paper);
+      background: rgba(5,5,5,.92);
+      cursor: pointer;
+      transition: color .3s ease, background .3s ease;
+    }
+
+    .music-control:hover .music-toggle,
+    .music-control:focus-within .music-toggle {
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    .music-toggle svg { width: 22px; height: 22px; fill: currentColor; }
+    .music-control.muted .music-waves { opacity: .22; }
+
+    .music-slider-panel {
+      width: 0;
+      overflow: hidden;
+      border: 1px solid transparent;
+      background: rgba(5,5,5,.92);
+      transition:
+        width .35s var(--ease),
+        padding .35s var(--ease),
+        border-color .35s ease,
+        background .3s ease;
+    }
+
+    .music-control:hover .music-slider-panel,
+    .music-control:focus-within .music-slider-panel {
+      width: 150px;
+      height: 54px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      border-color: var(--paper);
+      border-right: 0;
+      background: var(--paper);
+    }
+
+    .music-control:hover .music-volume,
+    .music-control:focus-within .music-volume {
+      accent-color: var(--ink);
+    }
+
+    .music-control.site-music-enter {
+      animation: siteMusicEnter .45s var(--ease) forwards;
+    }
+
+    @keyframes siteMusicEnter {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(.82);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+}
+
+    .music-volume { width: 122px; accent-color: var(--paper); cursor: pointer; }
+
+    body.intro-active .music-control {
+      z-index: 1005;
+      right: 50%;
+      bottom: calc(50% - 310px);
+      transform: translateX(50%) translateY(24px) scale(.82);
+      opacity: 0;
+      animation: musicIntroIn .45s var(--ease) .25s forwards;
+    }
+
+      body.intro-active .music-control.music-exiting {
+        animation: none;
+        opacity: 0;
+        transform: translateX(50%) translateY(24px) scale(.82);
+        transition:
+          opacity .35s ease,
+          transform .45s var(--ease);
+  }
+
+@keyframes musicIntroIn {
+  to {
+    opacity: 1;
+    transform: translateX(50%) translateY(0) scale(1);
+  }
+}
+
     .hero {
       position: relative;
       min-height: 100svh;
@@ -2170,6 +2281,11 @@
       .back-to-top { right: 14px; bottom: 14px; width: 58px; }
       .back-to-top span { font-size: .5rem; }
       .back-to-top strong { font-size: 1.1rem; }
+      .music-control { right: 80px; bottom: 14px; }
+      .music-toggle { width: 50px; height: 50px; }
+      .music-control:hover .music-slider-panel,
+      .music-control:focus-within .music-slider-panel { width: 128px; padding: 15px 10px; }
+      .music-volume { width: 106px; }
       .copy-message { right: 14px; bottom: 84px; }
       .intro-title { font-size: clamp(4rem, 23vw, 7rem); }
       .intro-controls { display: grid; }
@@ -2316,7 +2432,6 @@
       </div>
       <div class="intro-controls">
         <button class="intro-enter" id="intro-enter" type="button" disabled>Enter portfolio</button>
-        <button class="intro-sound" id="intro-sound" type="button" aria-pressed="true">Sound / On</button>
       </div>
     </div>
   </div>
@@ -2333,13 +2448,20 @@
       <a href="#profiles-title">Profiles</a>
       <a href="#terminal-title">Terminal</a>
       <a href="#footer">Instagram</a>
-      <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="true">Sound / On</button>
     </div>
   </nav>
 
   <a class="back-to-top" id="back-to-top" href="#top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
     <span>Top</span><strong aria-hidden="true">↑</strong>
   </a>
+
+  <audio id="background-music" src="assets/in-search-of-splintered-memories.mp3" loop preload="metadata"></audio>
+  <div class="music-control" id="music-control">
+    <button class="music-toggle" id="music-toggle" type="button" aria-label="Mute music" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm11.5-.5v7a4 4 0 0 0 0-7zm0-4v2.1a6 6 0 0 1 0 10.8v2.1a8 8 0 0 0 0-15z" class="music-waves"/></svg>
+    </button>
+    <div class="music-slider-panel"><input class="music-volume" id="music-volume" type="range" min="0" max="100" value="15" aria-label="Music volume"></div>
+  </div>
 
   <main id="top">
     <header class="hero">
@@ -2694,8 +2816,10 @@
     const copyMessage = document.querySelector('.copy-message');
     const introScreen = document.getElementById('intro-screen');
     const introEnter = document.getElementById('intro-enter');
-    const introSound = document.getElementById('intro-sound');
-    const soundToggle = document.getElementById('sound-toggle');
+    const backgroundMusic = document.getElementById('background-music');
+    const musicControl = document.getElementById('music-control');
+    const musicToggle = document.getElementById('music-toggle');
+    const musicVolume = document.getElementById('music-volume');
     const introProgressBar = document.getElementById('intro-progress-bar');
     const introPercent = document.getElementById('intro-percent');
     const introStatus = document.getElementById('intro-status');
@@ -2748,12 +2872,10 @@
       element.setAttribute('aria-hidden', 'true');
     });
 
-    let soundEnabled = true;
     let audioContext;
     let copyTimer;
 
     const getAudioContext = () => {
-      if (!soundEnabled) return null;
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (!AudioContextClass) return null;
       if (!audioContext) audioContext = new AudioContextClass();
@@ -2779,7 +2901,6 @@
     };
 
     const playSound = (name) => {
-      if (!soundEnabled) return;
       if (name === 'enter') {
         tone(196, .5, 'sine', .035);
         tone(293.66, .52, 'sine', .028, .08);
@@ -2821,28 +2942,37 @@
       }
     };
 
-    const updateSoundControls = () => {
-      const text = soundEnabled ? 'Sound / On' : 'Sound / Off';
-      introSound.textContent = text;
-      introSound.setAttribute('aria-pressed', String(soundEnabled));
-      soundToggle.textContent = text;
-      soundToggle.setAttribute('aria-pressed', String(soundEnabled));
+
+    const updateMusicControl = () => {
+      const muted = backgroundMusic.muted;
+      musicControl.classList.toggle('muted', muted);
+      musicToggle.setAttribute('aria-pressed', String(muted));
+      musicToggle.setAttribute('aria-label', muted ? 'Unmute music' : 'Mute music');
     };
 
-    const toggleSound = () => {
-      if (soundEnabled) {
-        playSound('click');
-        soundEnabled = false;
-      } else {
-        soundEnabled = true;
-        playSound('reveal');
-      }
-      updateSoundControls();
-    };
+    musicToggle.addEventListener('click', () => {
+      backgroundMusic.muted = !backgroundMusic.muted;
+      updateMusicControl();
+    });
 
-    introSound.addEventListener('click', toggleSound);
-    soundToggle.addEventListener('click', toggleSound);
-    updateSoundControls();
+const MAX_MUSIC_VOLUME = 0.1;
+
+const applyMusicVolume = () => {
+  backgroundMusic.volume =
+    (Number(musicVolume.value) / 100) * MAX_MUSIC_VOLUME;
+};
+
+applyMusicVolume();
+
+musicVolume.addEventListener('input', () => {
+  applyMusicVolume();
+
+  if (Number(musicVolume.value) > 0) {
+    backgroundMusic.muted = false;
+  }
+
+  updateMusicControl();
+});
 
     document.addEventListener('pointerover', (event) => {
       if (event.pointerType === 'touch') return;
@@ -3078,8 +3208,10 @@
     }, reducedMotion ? 30 : 75);
 
     introEnter.addEventListener('click', () => {
+      musicControl.classList.add("music-exiting");
       getAudioContext();
       playSound('enter');
+      if (!backgroundMusic.muted) backgroundMusic.play().catch(() => {});
       introScreen.classList.add('leaving');
       setTimeout(() => {
         document.body.classList.add('hero-door-opening');
@@ -3089,7 +3221,21 @@
       setTimeout(() => {
         introScreen.classList.add('done');
         introScreen.setAttribute('aria-hidden', 'true');
+
+        musicControl.classList.remove('music-exiting');
+        musicControl.classList.add('site-music-waiting');
+
         document.body.classList.remove('intro-active');
+
+        setTimeout(() => {
+          musicControl.classList.remove('site-music-waiting');
+          musicControl.classList.add('site-music-enter');
+
+          setTimeout(() => {
+            musicControl.classList.remove('site-music-enter');
+          }, 500);
+        }, reducedMotion ? 0 : 500);
+
         introContent.forEach((element) => {
           element.removeAttribute('inert');
           element.removeAttribute('aria-hidden');

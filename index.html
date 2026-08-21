@@ -2010,6 +2010,28 @@
       }
       .terminal-section::before { background-position: center -120px; }
       .terminal-section .terminal-header { margin-bottom: 145px; }
+
+      /* Keep the complete unlocked archive in one 1920 x 1080 frame. */
+      .projects.unlocked {
+        min-height: calc(100svh - 68px);
+        padding: 70px 0 54px;
+      }
+      .projects.unlocked h2 {
+        margin-bottom: 24px;
+        font-size: clamp(4.5rem, 6.6vw, 7.4rem);
+        line-height: .82;
+      }
+      .projects.unlocked .archive-layout { align-items: stretch; }
+      .projects.unlocked .archive-visual { min-height: 530px; }
+      .projects.unlocked .project-card {
+        min-height: 132px;
+        padding-block: 14px;
+      }
+      .projects.unlocked .project-title { font-size: clamp(1.8rem, 3vw, 3.35rem); }
+      .projects.unlocked .project-desc {
+        font-size: .78rem;
+        line-height: 1.35;
+      }
     }
 
     .projects {

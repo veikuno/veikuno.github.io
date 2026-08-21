@@ -353,6 +353,207 @@
     .back-to-top span { font-size: .56rem; letter-spacing: .12em; }
     .back-to-top strong { font: 400 1.35rem/1 "DM Mono", monospace; }
 
+    .next-page-control,
+    .previous-page-control {
+      position: fixed;
+      z-index: 104;
+      left: 50%;
+      width: 82px;
+      height: 82px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--paper);
+      color: var(--paper);
+      background: rgba(5,5,5,.9);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 12px 32px rgba(0,0,0,.36);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      transform: translate(-50%, 22px) scale(.82);
+      pointer-events: none;
+      transition: opacity .35s ease, transform .45s var(--ease), color .3s ease, background .3s ease;
+    }
+
+    .next-page-control { bottom: 28px; }
+    .previous-page-control { top: 88px; transform: translate(-50%, -22px) scale(.82); }
+
+    body.site-ready:not(.intro-active) .next-page-control.visible,
+    body.site-ready:not(.intro-active) .previous-page-control.visible {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+      pointer-events: auto;
+    }
+
+    .next-page-control::before {
+      position: absolute;
+      right: 50%;
+      bottom: calc(100% + 8px);
+      width: max-content;
+      max-width: 70vw;
+      padding: 6px 9px;
+      content: "Click to continue / " attr(data-next-label);
+      color: var(--ink);
+      background: var(--paper);
+      font-size: .54rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .88;
+      transform: translate(50%, 0);
+      pointer-events: none;
+      transition: opacity .25s ease, transform .3s var(--ease);
+      animation: continue-tip-pulse 2.2s ease-in-out infinite;
+    }
+
+    .previous-page-control::after {
+      position: absolute;
+      right: 50%;
+      top: calc(100% + 8px);
+      width: max-content;
+      max-width: 70vw;
+      padding: 6px 9px;
+      content: attr(data-previous-label);
+      color: var(--ink);
+      background: var(--paper);
+      font-size: .54rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translate(50%, -7px);
+      pointer-events: none;
+      transition: opacity .25s ease, transform .3s var(--ease);
+    }
+
+    .next-page-control:hover,
+    .next-page-control:focus-visible,
+    .previous-page-control:hover,
+    .previous-page-control:focus-visible {
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    .next-page-control:hover,
+    .next-page-control:focus-visible {
+      transform: translate(-50%, -5px) scale(1);
+    }
+
+    .previous-page-control:hover,
+    .previous-page-control:focus-visible { transform: translate(-50%, 5px) scale(1); }
+
+    .next-page-control:hover::before,
+    .next-page-control:focus-visible::before { opacity: 1; transform: translate(50%, 0); }
+
+    .previous-page-control:hover::after,
+    .previous-page-control:focus-visible::after { opacity: 1; transform: translate(50%, 0); }
+
+    .next-page-arrow,
+    .previous-page-arrow {
+      font: 400 2.15rem/1 "DM Mono", monospace;
+    }
+
+    .next-page-arrow {
+      animation: next-page-bounce 1.45s var(--ease) infinite;
+    }
+
+    .previous-page-arrow { animation: previous-page-bounce 1.45s var(--ease) infinite; }
+
+    .next-page-control.jumping .next-page-arrow { animation: next-page-launch .42s var(--ease); }
+    .previous-page-control.jumping .previous-page-arrow { animation: previous-page-launch .42s var(--ease); }
+
+    .page-transition-flash {
+      position: fixed;
+      z-index: 999;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.96) 0, rgba(255,255,255,.52) 24%, rgba(255,255,255,.08) 68%, transparent 82%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .page-transition-flash::before {
+      position: absolute;
+      z-index: 1;
+      left: -8%;
+      width: 116%;
+      height: 18vh;
+      content: "";
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,.98) 46%, transparent);
+      filter: blur(8px);
+      box-shadow: 0 0 50px rgba(255,255,255,.82);
+      transform: translateY(-22vh);
+    }
+
+    .page-transition-flash::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background: linear-gradient(180deg, transparent 0, rgba(5,5,5,.48) 42%, rgba(5,5,5,.72) 50%, rgba(5,5,5,.48) 58%, transparent 100%);
+      transform: translateY(-101%);
+    }
+
+    .page-transition-flash.active {
+      visibility: visible;
+      animation: page-flash .68s ease both;
+    }
+
+    .page-transition-flash.active::before { animation: page-flash-line .68s var(--ease) both; }
+    .page-transition-flash.active::after { animation: page-flash-sweep .68s var(--ease) both; }
+    .page-transition-flash.active.reverse::before { animation-name: page-flash-line-reverse; }
+    .page-transition-flash.active.reverse::after { animation-name: page-flash-sweep-reverse; }
+
+    @keyframes next-page-bounce {
+      0%, 100% { transform: translateY(-5px); }
+      50% { transform: translateY(7px); }
+    }
+
+    @keyframes previous-page-bounce {
+      0%, 100% { transform: translateY(5px); }
+      50% { transform: translateY(-7px); }
+    }
+
+    @keyframes next-page-launch {
+      0% { transform: translateY(0); opacity: 1; }
+      55% { transform: translateY(16px); opacity: 0; }
+      56% { transform: translateY(-14px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes previous-page-launch {
+      0% { transform: translateY(0); opacity: 1; }
+      55% { transform: translateY(-16px); opacity: 0; }
+      56% { transform: translateY(14px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes page-flash {
+      0%, 100% { opacity: 0; }
+      12% { opacity: .25; }
+      28% { opacity: 1; }
+      52% { opacity: .48; }
+    }
+
+    @keyframes page-flash-sweep {
+      0% { transform: translateY(-101%); }
+      72%, 100% { transform: translateY(101%); }
+    }
+
+    @keyframes page-flash-sweep-reverse {
+      0% { transform: translateY(101%); }
+      72%, 100% { transform: translateY(-101%); }
+    }
+
+    @keyframes page-flash-line {
+      0% { transform: translateY(-22vh); opacity: 0; }
+      12% { opacity: 1; }
+      78%, 100% { transform: translateY(106vh); opacity: 0; }
+    }
+
+    @keyframes page-flash-line-reverse {
+      0% { transform: translateY(106vh); opacity: 0; }
+      12% { opacity: 1; }
+      78%, 100% { transform: translateY(-22vh); opacity: 0; }
+    }
+
     .music-control {
       position: fixed;
       z-index: 106;
@@ -648,9 +849,10 @@
       height: 100%;
       translate: 0 0;
       will-change: translate, transform;
+      animation: portrait-float 4.6s ease-in-out infinite;
     }
 
-    body.site-ready .hero.in-view .hero-visual { animation: portrait-float 5.8s ease-in-out infinite 1.8s; }
+    body.site-ready .hero.in-view .hero-visual { animation-duration: 4.6s; }
 
     .hero-photo {
       height: 100%;
@@ -1282,6 +1484,18 @@
       background: linear-gradient(90deg, rgba(5,5,5,.54), rgba(5,5,5,.23) 47%, rgba(5,5,5,.52));
     }
 
+    /* Desktop crop targets are tuned against a 1920 x 1080 viewport. */
+    @media (min-width: 1200px) and (min-aspect-ratio: 16 / 10) {
+      .cinematic--about .cinematic-image { object-position: center 48%; }
+      .games::before { background-position: center -150px; }
+      .terminal-section {
+        min-height: calc(100svh + 230px);
+        padding-top: 105px;
+      }
+      .terminal-section::before { background-position: center -120px; }
+      .terminal-section .terminal-header { margin-bottom: 145px; }
+    }
+
     .games > .page { position: relative; z-index: 2; }
 
     .games-header {
@@ -1788,6 +2002,16 @@
     .terminal-gift.opened .gift-button { transform: scale(1.35) rotate(8deg); opacity: 0; pointer-events: none; }
     .terminal-gift.opened .gift-wrap { pointer-events: none; }
 
+    /* Keep the terminal portrait clear of the gift at a 1920 x 1080 viewport. */
+    @media (min-width: 1200px) and (min-aspect-ratio: 16 / 10) {
+      .terminal-section {
+        min-height: calc(100svh + 230px);
+        padding-top: 105px;
+      }
+      .terminal-section::before { background-position: center -120px; }
+      .terminal-section .terminal-header { margin-bottom: 145px; }
+    }
+
     .projects {
       position: relative;
       min-height: 100svh;
@@ -1795,6 +2019,12 @@
       padding: 150px 0;
       color: var(--ink);
       background: var(--paper);
+    }
+
+    .projects:not(.unlocked) {
+      height: calc(100svh - 68px);
+      min-height: calc(100svh - 68px);
+      padding-block: 0;
     }
 
     .projects::before {
@@ -2194,7 +2424,11 @@
     }
     @keyframes portrait-float {
       0%, 100% { translate: 0 0; }
-      50% { translate: 0 -36px; }
+      50% { translate: 0 -66px; }
+    }
+    @keyframes continue-tip-pulse {
+      0%, 100% { opacity: .58; transform: translate(50%, 4px); }
+      50% { opacity: 1; transform: translate(50%, -3px); }
     }
     @keyframes intro-icon-drift {
       0%, 100% { transform: translate3d(0, 0, 0) rotate(-5deg); }
@@ -2285,6 +2519,9 @@
       .back-to-top span { font-size: .5rem; }
       .back-to-top strong { font-size: 1.1rem; }
       .music-control { right: 80px; bottom: 14px; }
+      .next-page-control { bottom: 14px; width: 70px; height: 70px; }
+      .previous-page-control { top: 80px; width: 70px; height: 70px; }
+      .next-page-arrow, .previous-page-arrow { font-size: 1.8rem; }
       .music-toggle { width: 50px; height: 50px; }
       .music-control:hover .music-slider-panel,
       .music-control:focus-within .music-slider-panel { width: 128px; padding: 15px 10px; }
@@ -2457,6 +2694,14 @@
   <a class="back-to-top" id="back-to-top" href="#top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
     <span>Top</span><strong aria-hidden="true">↑</strong>
   </a>
+
+  <button class="previous-page-control" id="previous-page-control" type="button" aria-label="Go to previous page" aria-hidden="true" tabindex="-1" data-previous-label="Previous page">
+    <span class="previous-page-arrow" aria-hidden="true">↑</span>
+  </button>
+  <button class="next-page-control" id="next-page-control" type="button" aria-label="Go to next page" aria-hidden="true" tabindex="-1" data-next-label="Next page">
+    <span class="next-page-arrow" aria-hidden="true">↓</span>
+  </button>
+  <div class="page-transition-flash" id="page-transition-flash" aria-hidden="true"></div>
 
   <audio id="background-music" src="assets/in-search-of-splintered-memories.mp3" loop preload="metadata"></audio>
   <div class="music-control" id="music-control">
@@ -2812,6 +3057,9 @@
     const siteNav = document.querySelector('.site-nav');
     const mobileNavToggle = document.getElementById('mobile-nav-toggle');
     const backToTop = document.getElementById('back-to-top');
+    const previousPageControl = document.getElementById('previous-page-control');
+    const nextPageControl = document.getElementById('next-page-control');
+    const pageTransitionFlash = document.getElementById('page-transition-flash');
     const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
     const playerStage = document.querySelector('.player-stage');
     const playerCurtain = document.querySelector('.player-curtain');
@@ -2840,7 +3088,7 @@
     const projectsLockScreen = document.getElementById('projects-lock-screen');
     const vaultLockButton = document.getElementById('vault-lock-button');
     const vaultLockLabel = document.getElementById('vault-lock-label');
-    const introContent = [...document.querySelectorAll('.site-nav, .back-to-top, main, .footer')];
+    const introContent = [...document.querySelectorAll('.site-nav, .back-to-top, .previous-page-control, .next-page-control, main, .footer')];
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -2920,6 +3168,10 @@
       } else if (name === 'reveal') {
         tone(330, .09, 'triangle', .018);
         tone(494, .13, 'triangle', .014, .05);
+      } else if (name === 'page-flash') {
+        tone(1480, .055, 'square', .012);
+        tone(920, .12, 'sawtooth', .016, .018);
+        tone(460, .2, 'triangle', .014, .055);
       } else if (name === 'hover') {
         tone(720, .04, 'square', .007);
       } else if (name === 'gift') {
@@ -2943,6 +3195,18 @@
       } else {
         tone(440, .065, 'square', .014);
       }
+    };
+
+    let interactionFlashTimer;
+    const triggerInteractionFlash = (reverse = false) => {
+      clearTimeout(interactionFlashTimer);
+      pageTransitionFlash.classList.remove('active', 'reverse');
+      void pageTransitionFlash.offsetWidth;
+      pageTransitionFlash.classList.toggle('reverse', reverse);
+      pageTransitionFlash.classList.add('active');
+      interactionFlashTimer = setTimeout(() => {
+        pageTransitionFlash.classList.remove('active', 'reverse');
+      }, reducedMotion ? 40 : 720);
     };
 
 
@@ -3014,12 +3278,22 @@ musicVolume.addEventListener('input', () => {
         hatchOpening = true;
         profileHatch.classList.add('opening');
         hatchWheel.setAttribute('aria-expanded', 'true');
+        triggerInteractionFlash();
         playSound('hatch');
         hatchOpenTimer = setTimeout(() => {
           profileSection.classList.remove('profile-locked');
           profileSection.classList.add('hatch-open');
           profileContent.removeAttribute('inert');
           profileContent.removeAttribute('aria-hidden');
+
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            const contentBottom = profileContent.getBoundingClientRect().bottom;
+            const visibleBottom = window.innerHeight - 96;
+            const cameraShift = Math.max(0, contentBottom - visibleBottom);
+            if (cameraShift > 1) {
+              window.scrollBy({ top: cameraShift, behavior: reducedMotion ? 'auto' : 'smooth' });
+            }
+          }));
         }, reducedMotion ? 40 : 950);
       }
     };
@@ -3092,7 +3366,7 @@ musicVolume.addEventListener('input', () => {
         hatchWasVisible = true;
       } else if (hatchWasVisible) {
         const gamesTitle = document.getElementById('games-title');
-        const preserveScrollPosition = entry.boundingClientRect.bottom <= 0;
+        const preserveScrollPosition = entry.boundingClientRect.top < 0;
         const gamesTopBefore = preserveScrollPosition ? gamesTitle.getBoundingClientRect().top : 0;
         resetHatch();
         profileHatch.classList.remove('arrived');
@@ -3124,6 +3398,7 @@ musicVolume.addEventListener('input', () => {
 
     giftButton.addEventListener('click', () => {
       if (terminalGift.classList.contains('opened')) return;
+      triggerInteractionFlash();
       playSound('gift');
       terminalGift.classList.add('opened');
       giftButton.setAttribute('aria-expanded', 'true');
@@ -3152,6 +3427,7 @@ musicVolume.addEventListener('input', () => {
 
     vaultLockButton.addEventListener('click', () => {
       if (lockStage >= 3) return;
+      triggerInteractionFlash();
       lockStage += 1;
       const remaining = 3 - lockStage;
       projectsLockScreen.dataset.stage = String(lockStage);
@@ -3188,9 +3464,17 @@ musicVolume.addEventListener('input', () => {
         projectsLockScreen.classList.add('arrived');
         projectsWereVisible = true;
       } else if (projectsWereVisible) {
+        const preserveScrollPosition = entry.boundingClientRect.top < 0;
+        const projectsHeightBefore = preserveScrollPosition ? projectsSection.getBoundingClientRect().height : 0;
         resetProjectLock();
         projectsLockScreen.classList.remove('arrived');
         projectsWereVisible = false;
+        if (preserveScrollPosition) {
+          const layoutShift = projectsSection.getBoundingClientRect().height - projectsHeightBefore;
+          setTimeout(() => {
+            if (Math.abs(layoutShift) > 1) window.scrollBy(0, layoutShift);
+          }, 80);
+        }
       }
     }, { threshold: .08 });
 
@@ -3243,6 +3527,7 @@ musicVolume.addEventListener('input', () => {
           element.removeAttribute('inert');
           element.removeAttribute('aria-hidden');
         });
+        updateNextPageControl();
       }, reducedMotion ? 40 : 1400);
     });
 
@@ -3265,6 +3550,103 @@ musicVolume.addEventListener('input', () => {
 
     document.querySelectorAll('.hero, .reveal, .stagger, .scene-reveal').forEach((element) => revealObserver.observe(element));
 
+    const pageStops = [
+      { id: 'top', label: 'Landing' },
+      { id: 'about-me', label: 'About Me' },
+      { id: 'profile', label: 'Profile' },
+      { id: 'games-title', label: 'Games and UIDs' },
+      { id: 'games', label: 'Game IDs' },
+      { id: 'profiles-title', label: 'Profiles' },
+      { id: 'projects', label: 'Profile Archive' },
+      { id: 'terminal-title', label: 'Terminal' },
+      { id: 'terminal', label: 'Connection Terminal' },
+      { id: 'footer', label: 'Instagram' }
+    ].map((stop) => ({ ...stop, element: document.getElementById(stop.id) })).filter((stop) => stop.element);
+
+    const getPageStopTop = (stop) => stop.element.getBoundingClientRect().top + window.scrollY;
+
+    const getCurrentPageIndex = () => {
+      const marker = window.scrollY + Math.min(window.innerHeight * .34, 300);
+      let currentIndex = 0;
+      pageStops.forEach((stop, index) => {
+        if (getPageStopTop(stop) <= marker) currentIndex = index;
+      });
+      return currentIndex;
+    };
+
+    const updateNextPageControl = () => {
+      const currentIndex = getCurrentPageIndex();
+      const previousStop = pageStops[currentIndex - 1];
+      const nextStop = pageStops[currentIndex + 1];
+      const previousIsAvailable = Boolean(previousStop) && !document.body.classList.contains('intro-active');
+      const isAvailable = Boolean(nextStop) && !document.body.classList.contains('intro-active');
+      previousPageControl.classList.toggle('visible', previousIsAvailable);
+      previousPageControl.setAttribute('aria-hidden', String(!previousIsAvailable));
+      previousPageControl.tabIndex = previousIsAvailable ? 0 : -1;
+      nextPageControl.classList.toggle('visible', isAvailable);
+      nextPageControl.setAttribute('aria-hidden', String(!isAvailable));
+      nextPageControl.tabIndex = isAvailable ? 0 : -1;
+
+      if (nextStop) {
+        nextPageControl.dataset.nextLabel = `Next / ${nextStop.label}`;
+        nextPageControl.setAttribute('aria-label', `Go to next page: ${nextStop.label}`);
+      }
+
+      if (previousStop) {
+        previousPageControl.dataset.previousLabel = `Previous / ${previousStop.label}`;
+        previousPageControl.setAttribute('aria-label', `Go to previous page: ${previousStop.label}`);
+      }
+    };
+
+    previousPageControl.addEventListener('click', () => {
+      const previousStop = pageStops[getCurrentPageIndex() - 1];
+      if (!previousStop) return;
+
+      previousPageControl.classList.remove('jumping');
+      pageTransitionFlash.classList.remove('active');
+      pageTransitionFlash.classList.add('reverse');
+      void pageTransitionFlash.offsetWidth;
+      previousPageControl.classList.add('jumping');
+      pageTransitionFlash.classList.add('active');
+      playSound('page-flash');
+
+      const navigationHeight = siteNav.getBoundingClientRect().height;
+      const destination = Math.max(0, getPageStopTop(previousStop) - navigationHeight);
+      setTimeout(() => {
+        window.scrollTo({ top: destination, behavior: reducedMotion ? 'auto' : 'smooth' });
+      }, reducedMotion ? 0 : 115);
+
+      setTimeout(() => {
+        previousPageControl.classList.remove('jumping');
+        pageTransitionFlash.classList.remove('active', 'reverse');
+        updateNextPageControl();
+      }, reducedMotion ? 40 : 720);
+    });
+
+    nextPageControl.addEventListener('click', () => {
+      const nextStop = pageStops[getCurrentPageIndex() + 1];
+      if (!nextStop) return;
+
+      nextPageControl.classList.remove('jumping');
+      pageTransitionFlash.classList.remove('active', 'reverse');
+      void pageTransitionFlash.offsetWidth;
+      nextPageControl.classList.add('jumping');
+      pageTransitionFlash.classList.add('active');
+      playSound('page-flash');
+
+      const navigationHeight = siteNav.getBoundingClientRect().height;
+      const destination = Math.max(0, getPageStopTop(nextStop) - navigationHeight);
+      setTimeout(() => {
+        window.scrollTo({ top: destination, behavior: reducedMotion ? 'auto' : 'smooth' });
+      }, reducedMotion ? 0 : 115);
+
+      setTimeout(() => {
+        nextPageControl.classList.remove('jumping');
+        pageTransitionFlash.classList.remove('active');
+        updateNextPageControl();
+      }, reducedMotion ? 40 : 720);
+    });
+
     const updateFixedNavigation = () => {
       const hasScrolled = window.scrollY > 24;
       const showBackToTop = window.scrollY > Math.max(520, window.innerHeight * .65);
@@ -3272,6 +3654,7 @@ musicVolume.addEventListener('input', () => {
       backToTop.classList.toggle('visible', showBackToTop);
       backToTop.setAttribute('aria-hidden', String(!showBackToTop));
       backToTop.tabIndex = showBackToTop ? 0 : -1;
+      updateNextPageControl();
     };
 
     window.addEventListener('scroll', updateFixedNavigation, { passive: true });
@@ -3365,6 +3748,7 @@ musicVolume.addEventListener('input', () => {
     };
 
     playerCurtain.addEventListener('click', () => {
+      triggerInteractionFlash();
       playSound('door');
       playerStage.classList.add('open');
       playerCurtain.setAttribute('aria-expanded', 'true');
@@ -3372,7 +3756,10 @@ musicVolume.addEventListener('input', () => {
     });
 
     document.querySelectorAll('[data-copy]').forEach((button) => {
-      button.addEventListener('click', () => copyValue(button.dataset.copy));
+      button.addEventListener('click', () => {
+        triggerInteractionFlash();
+        copyValue(button.dataset.copy);
+      });
     });
 
     const noteContent = {

@@ -3170,6 +3170,70 @@
       .footer-signoff { margin-top: 15px; font-size: clamp(1.5rem, 8vw, 2.2rem); }
       .footer-art { width: min(100%, 310px); margin: 0 auto; }
       .footer-bottom { flex-direction: row; margin-top: 14px; font-size: .5rem; }
+
+      /* Mobile composition and performance tuning. */
+      .hero-grid {
+        box-sizing: border-box;
+        height: 100%;
+        min-height: 0;
+        padding: 92px 0 82px;
+        gap: 10px;
+        align-content: center;
+      }
+      .hero-copy { padding-top: 14px; }
+      .hero-intro {
+        margin: 0 0 12px;
+        font-size: .68rem;
+        line-height: 1.42;
+      }
+      .hero-actions .button.primary {
+        width: min(100%, 310px);
+        min-width: 0;
+        min-height: 54px;
+        padding-inline: 18px;
+        font-size: .68rem;
+      }
+      .hero-visual-shell {
+        width: min(68vw, 270px);
+        max-height: 44svh;
+        margin: 4px auto 0;
+      }
+
+      .games::before { background-position: 35% center; }
+      .player-stage.open {
+        height: auto;
+        min-height: 0;
+      }
+      .player-stage.open .game-list { min-height: 0; }
+      .player-stage.open .player-art {
+        inset: 0;
+        height: 100%;
+        object-position: 39% center;
+      }
+
+      .archive-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
+      }
+      .project-card { padding-inline: 7px; }
+      .project-title { font-size: clamp(.76rem, 3.8vw, 1rem); }
+      .project-desc { font-size: .46rem; }
+
+      .nav-links,
+      .profile-note-output,
+      .projects-lock-ui { -webkit-backdrop-filter: none; backdrop-filter: none; }
+      .screen-orbit-light {
+        stroke-width: 6px;
+        filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 11px rgba(255,255,255,.62));
+      }
+      .screen-orbit-lights::before {
+        box-shadow: inset 0 0 8px rgba(255,255,255,.05), 0 0 9px rgba(255,255,255,.18);
+      }
+      .floating-icon,
+      .intro-float-icon,
+      .orbit-icon,
+      .hero-visual,
+      .cinematic-image { will-change: auto; }
     }
 
     @media (pointer: fine) {
@@ -4324,7 +4388,7 @@ musicVolume.addEventListener('input', () => {
       if (window.innerWidth > 640) closeMobileNavigation();
     });
 
-    if (!reducedMotion) {
+    if (!reducedMotion && (finePointer || window.innerWidth > 640)) {
       let ticking = false;
 
       const updateScrollEffects = () => {

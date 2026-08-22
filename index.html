@@ -2796,6 +2796,10 @@
       0%, 100% { translate: 0 0; }
       50% { translate: 0 -66px; }
     }
+    @keyframes portrait-float-mobile {
+      0%, 100% { translate: 0 8px; }
+      50% { translate: 0 -8px; }
+    }
     @keyframes continue-tip-pulse {
       0%, 100% { opacity: .58; transform: translate(50%, 4px); }
       50% { opacity: 1; transform: translate(50%, -3px); }
@@ -3183,9 +3187,12 @@
       .hero-copy { padding-top: 14px; }
       .hero-actions { justify-items: center; }
       .hero-intro {
-        margin: 0 0 12px;
+        width: 100%;
+        max-width: none;
+        margin: 0 auto 12px;
         font-size: .68rem;
         line-height: 1.42;
+        text-align: center;
       }
       .hero-actions .button.primary {
         width: min(100%, 310px);
@@ -3197,8 +3204,9 @@
       .hero-visual-shell {
         width: min(58vw, 228px);
         max-height: 37svh;
-        margin: 12px auto 0;
+        margin: 28px auto 0;
       }
+      .hero-visual { animation-name: portrait-float-mobile; }
 
       .games::before { background-position: 35% center; }
       .profile::before { background-position: 74% center; }

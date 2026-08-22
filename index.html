@@ -3181,6 +3181,7 @@
         align-content: center;
       }
       .hero-copy { padding-top: 14px; }
+      .hero-actions { justify-items: center; }
       .hero-intro {
         margin: 0 0 12px;
         font-size: .68rem;
@@ -3194,12 +3195,15 @@
         font-size: .68rem;
       }
       .hero-visual-shell {
-        width: min(68vw, 270px);
-        max-height: 44svh;
-        margin: 4px auto 0;
+        width: min(58vw, 228px);
+        max-height: 37svh;
+        margin: 12px auto 0;
       }
 
       .games::before { background-position: 35% center; }
+      .profile::before { background-position: 74% center; }
+      .vault-panel::before { background-position: 65% 32%; }
+      .terminal-section::before { background-position: 52% top; }
       .player-stage.open {
         height: auto;
         min-height: 0;
@@ -3234,6 +3238,7 @@
       .orbit-icon,
       .hero-visual,
       .cinematic-image { will-change: auto; }
+
     }
 
     @media (pointer: fine) {
@@ -3662,21 +3667,30 @@
 
     const scheduleAmbientFlash = (element) => {
       if (reducedMotion) return;
+      const mobilePerformanceMode = window.matchMedia('(max-width: 640px) and (pointer: coarse)').matches;
 
       const flash = () => {
-        const baseOpacity = Number.parseFloat(getComputedStyle(element).opacity) || .5;
-        element.animate([
-          { opacity: baseOpacity },
-          { opacity: 1, offset: .24 },
-          { opacity: Math.max(baseOpacity, .7), offset: .5 },
-          { opacity: 1, offset: .68 },
-          { opacity: baseOpacity }
-        ], {
-          duration: 660,
-          easing: 'cubic-bezier(.22,.8,.2,1)'
-        });
+        const bounds = element.getBoundingClientRect();
+        const nearViewport = bounds.bottom > -80 && bounds.top < window.innerHeight + 80;
 
-        window.setTimeout(flash, 3000 + Math.random() * 5200);
+        if (!mobilePerformanceMode || nearViewport) {
+          const baseOpacity = Number.parseFloat(getComputedStyle(element).opacity) || .5;
+          element.animate([
+            { opacity: baseOpacity },
+            { opacity: 1, offset: .24 },
+            { opacity: Math.max(baseOpacity, .7), offset: .5 },
+            { opacity: 1, offset: .68 },
+            { opacity: baseOpacity }
+          ], {
+            duration: 660,
+            easing: 'cubic-bezier(.22,.8,.2,1)'
+          });
+        }
+
+        const delay = mobilePerformanceMode
+          ? 5200 + Math.random() * 6500
+          : 3000 + Math.random() * 5200;
+        window.setTimeout(flash, delay);
       };
 
       window.setTimeout(flash, 1800 + Math.random() * 4600);

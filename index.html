@@ -2971,7 +2971,7 @@
         opacity: .63;
         background:
           linear-gradient(0deg, rgba(5,5,5,.78) 0%, rgba(5,5,5,.3) 48%, rgba(5,5,5,.55) 100%),
-          url("assets/hero-wings-art.png") center 30% / cover no-repeat;
+          url("assets/mobile/hero-wings-art.webp") center 30% / cover no-repeat;
       }
       body.site-ready .hero::before { opacity: .68; filter: grayscale(1) contrast(1.16) brightness(1); }
       .hero-entry-door strong { font-size: clamp(3.2rem, 21vw, 5.5rem); }
@@ -3064,6 +3064,47 @@
       .icon-divider-loop, .icon-divider-item { gap: 22px; }
       .icon-divider-loop { padding-right: 22px; }
       .icon-divider-item img { width: 44px; height: 44px; }
+
+      /* Mobile-sized WebP artwork. Desktop keeps the full-resolution originals. */
+      .intro-screen::before {
+        background-image:
+          linear-gradient(rgba(5,5,5,.14), rgba(5,5,5,.42)),
+          url("assets/mobile/intro-background-art-wide.webp");
+      }
+      .profile::before { background-image: url("assets/mobile/profile-background-wings-art.webp"); }
+      .hatch-panel::before {
+        background-image:
+          linear-gradient(180deg, rgba(5,5,5,.26), rgba(5,5,5,.7)),
+          url("assets/mobile/hatch-screen-art-upscaled.webp");
+      }
+      .hatch-frame {
+        background-image:
+          radial-gradient(circle at center, rgba(5,5,5,.78) 0 30%, rgba(5,5,5,.38) 58%, rgba(5,5,5,.68) 100%),
+          url("assets/mobile/profiles-lock-art.webp");
+      }
+      .games::before { background-image: url("assets/mobile/games-page-background-art-wide.webp"); }
+      .player-door-art {
+        background-image:
+          linear-gradient(rgba(5,5,5,.04), rgba(5,5,5,.26)),
+          url("assets/mobile/player-door-wide-outpaint-v2.webp");
+      }
+      .terminal-section::before { background-image: url("assets/mobile/terminal-page-background-art-wide.webp"); }
+      .terminal-output::before {
+        background-image:
+          linear-gradient(90deg, rgba(5,5,5,.52) 0%, rgba(5,5,5,.18) 62%, rgba(5,5,5,.34) 100%),
+          url("assets/mobile/terminal-scenes-art.webp");
+      }
+      .gift-paper::before {
+        background-image:
+          linear-gradient(rgba(255,255,255,.05), rgba(5,5,5,.18)),
+          url("assets/mobile/terminal-wrap-art.webp");
+      }
+      .projects::before { background-image: url("assets/mobile/profiles-background-art.webp"); }
+      .vault-panel::before {
+        background-image:
+          linear-gradient(rgba(5,5,5,.34), rgba(5,5,5,.46)),
+          url("assets/mobile/projects-lock-spear-art-wide.webp");
+      }
 
       /* Phone page framing: every navigation stop occupies one visible screen. */
       .hero { height: 100svh; min-height: 100svh; }
@@ -3373,7 +3414,7 @@
     </div>
 
     <section class="cinematic cinematic--about scene-reveal" id="about-me" aria-label="About Me">
-      <img class="cinematic-image" src="assets/cinematic-about-beam-art-upscaled.png" alt="Monochrome winged character crossed by a bright white beam" loading="lazy" data-parallax=".10">
+      <img class="cinematic-image" src="assets/cinematic-about-beam-art-upscaled.png" data-mobile-src="assets/mobile/cinematic-about-beam-art-upscaled.webp" alt="Monochrome winged character crossed by a bright white beam" loading="lazy" data-parallax=".10">
       <div class="cinematic-type reveal">
         <h2><span class="cinematic-line primary">About</span><span class="cinematic-line outline">Me.</span></h2>
       </div>
@@ -3449,7 +3490,7 @@
     </div>
 
     <section class="cinematic cinematic--games scene-reveal" id="games-title" aria-label="Games and UIDs">
-      <img class="cinematic-image" src="assets/cinematic-games-halo-art.png" alt="Monochrome winged character reaching toward a white beam" loading="lazy" data-parallax=".10">
+      <img class="cinematic-image" src="assets/cinematic-games-halo-art.png" data-mobile-src="assets/mobile/cinematic-games-halo-art.webp" alt="Monochrome winged character reaching toward a white beam" loading="lazy" data-parallax=".10">
       <div class="cinematic-type reveal">
         <h2><span class="cinematic-line primary">Games and</span><span class="cinematic-line outline">UIDs</span></h2>
       </div>
@@ -3473,7 +3514,7 @@
         </div>
 
         <div class="player-stage stagger" data-tilt="1.2">
-          <img class="player-art" src="assets/player-index-art.png" alt="Monochrome winged character artwork" loading="lazy">
+          <img class="player-art" src="assets/player-index-art.png" data-mobile-src="assets/mobile/player-index-art.webp" alt="Monochrome winged character artwork" loading="lazy">
           <div class="game-list" id="player-list" inert>
             <button class="game-row" type="button" data-copy="804085448" aria-label="Copy Genshin Impact UID 804085448">
               <span class="game-no">001</span><span class="game-name">Genshin</span><span class="game-id">UID : 804085448</span><span class="game-arrow">↗</span>
@@ -3503,7 +3544,7 @@
     </div>
 
     <section class="cinematic cinematic--profiles scene-reveal" id="profiles-title" aria-label="Profiles">
-      <img class="cinematic-image" src="assets/cinematic-profiles-embrace-art-16x9.png" alt="Monochrome illustration of two winged figures embracing" loading="lazy" data-parallax=".035">
+      <img class="cinematic-image" src="assets/cinematic-profiles-embrace-art-16x9.png" data-mobile-src="assets/mobile/cinematic-profiles-embrace-art-16x9.webp" alt="Monochrome illustration of two winged figures embracing" loading="lazy" data-parallax=".035">
       <div class="cinematic-type reveal">
         <h2><span class="cinematic-line primary">Profiles.</span></h2>
       </div>
@@ -3525,7 +3566,7 @@
 
         <div class="archive-layout">
           <figure class="archive-visual reveal from-left">
-            <img src="assets/archive-art.png" alt="Monochrome winged character standing beside a city fence" loading="lazy">
+            <img src="assets/archive-art.png" data-mobile-src="assets/mobile/archive-art.webp" alt="Monochrome winged character standing beside a city fence" loading="lazy">
             <figcaption class="archive-caption">Profile archive / 002</figcaption>
           </figure>
 
@@ -3579,7 +3620,7 @@
     </div>
 
     <section class="cinematic cinematic--terminal scene-reveal" id="terminal-title" aria-label="Terminal">
-      <img class="cinematic-image" src="assets/cinematic-terminal-art-upscaled.png" alt="Monochrome close-up portrait with a glowing halo" loading="lazy" data-parallax=".10">
+      <img class="cinematic-image" src="assets/cinematic-terminal-art-upscaled.png" data-mobile-src="assets/mobile/cinematic-terminal-art-upscaled.webp" alt="Monochrome close-up portrait with a glowing halo" loading="lazy" data-parallax=".10">
       <div class="cinematic-type reveal">
         <h2><span class="cinematic-line primary">Connection</span><span class="cinematic-line outline">Terminal.</span></h2>
       </div>
@@ -3646,7 +3687,7 @@
   </main>
 
   <footer class="footer" id="footer">
-    <img class="footer-background" src="assets/footer-background-art-upscaled.png" alt="" aria-hidden="true" loading="lazy" data-parallax=".035">
+    <img class="footer-background" src="assets/footer-background-art-upscaled.png" data-mobile-src="assets/mobile/footer-background-art-upscaled.webp" alt="" aria-hidden="true" loading="lazy" data-parallax=".035">
     <div class="page">
       <div class="footer-grid scene-reveal">
         <div class="reveal">
@@ -3657,7 +3698,7 @@
           <p class="footer-signoff">See you next time.</p>
         </div>
         <figure class="footer-art">
-          <img src="assets/footer-goodbye-art.png" alt="Monochrome close-up illustration of two characters" loading="lazy">
+          <img src="assets/footer-goodbye-art.png" data-mobile-src="assets/mobile/footer-goodbye-art.webp" alt="Monochrome close-up illustration of two characters" loading="lazy">
           <figcaption class="footer-art-label">End transmission / 005</figcaption>
         </figure>
       </div>
@@ -3672,10 +3713,16 @@
 
   <script>
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mobilePerformanceMode = window.matchMedia('(max-width: 640px) and (pointer: coarse)').matches;
+
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      document.querySelectorAll('[data-mobile-src]').forEach((image) => {
+        image.src = image.dataset.mobileSrc;
+      });
+    }
 
     const scheduleAmbientFlash = (element) => {
       if (reducedMotion) return;
-      const mobilePerformanceMode = window.matchMedia('(max-width: 640px) and (pointer: coarse)').matches;
 
       const flash = () => {
         const bounds = element.getBoundingClientRect();
@@ -4606,26 +4653,28 @@ musicVolume.addEventListener('input', () => {
     });
 
     const cursorGlow = document.getElementById('cursor-glow');
-    let lastTrailTime = 0;
+    if (!mobilePerformanceMode) {
+      let lastTrailTime = 0;
 
-    window.addEventListener('pointermove', (event) => {
-      if (event.pointerType === 'touch') return;
-      cursorGlow.style.left = `${event.clientX}px`;
-      cursorGlow.style.top = `${event.clientY}px`;
-      cursorGlow.classList.add('visible');
+      window.addEventListener('pointermove', (event) => {
+        if (event.pointerType === 'touch') return;
+        cursorGlow.style.left = `${event.clientX}px`;
+        cursorGlow.style.top = `${event.clientY}px`;
+        cursorGlow.classList.add('visible');
 
-      const now = performance.now();
-      if (reducedMotion || now - lastTrailTime < 28) return;
-      lastTrailTime = now;
-      const dot = document.createElement('span');
-      dot.className = 'cursor-trail-dot';
-      dot.style.left = `${event.clientX}px`;
-      dot.style.top = `${event.clientY}px`;
-      document.body.appendChild(dot);
-      dot.addEventListener('animationend', () => dot.remove(), { once: true });
-    }, { passive: true });
+        const now = performance.now();
+        if (reducedMotion || now - lastTrailTime < 28) return;
+        lastTrailTime = now;
+        const dot = document.createElement('span');
+        dot.className = 'cursor-trail-dot';
+        dot.style.left = `${event.clientX}px`;
+        dot.style.top = `${event.clientY}px`;
+        document.body.appendChild(dot);
+        dot.addEventListener('animationend', () => dot.remove(), { once: true });
+      }, { passive: true });
 
-    document.documentElement.addEventListener('pointerleave', () => cursorGlow.classList.remove('visible'));
+      document.documentElement.addEventListener('pointerleave', () => cursorGlow.classList.remove('visible'));
+    }
   </script>
 </body>
 </html>

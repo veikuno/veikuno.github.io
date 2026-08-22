@@ -467,13 +467,129 @@
     .next-page-control.jumping,
     .previous-page-control.jumping { animation: navigation-control-shake .42s linear; }
 
+    .screen-orbit-lights {
+      position: fixed;
+      z-index: 1190;
+      inset: 78px 0 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    @media (max-width: 980px) {
+      .screen-orbit-lights { top: 72px; }
+    }
+
+    @media (max-width: 640px) {
+      .screen-orbit-lights { top: 66px; }
+    }
+
+    .screen-orbit-lights::before {
+      position: absolute;
+      inset: 7px;
+      content: "";
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 9px;
+      box-shadow: inset 0 0 12px rgba(255,255,255,.04);
+      animation: screen-edge-pulse 2.4s ease-in-out infinite;
+    }
+
+    .screen-orbit-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .screen-orbit-light {
+      x: 11px;
+      y: 11px;
+      width: calc(100% - 22px);
+      height: calc(100% - 22px);
+      rx: 9px;
+      ry: 9px;
+      fill: none;
+      stroke: rgba(255,255,255,.96);
+      stroke-width: 8px;
+      stroke-linecap: round;
+      stroke-dasharray: 49 51;
+      filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 12px rgba(255,255,255,.95)) drop-shadow(0 0 24px rgba(255,255,255,.62));
+      animation: screen-orbit 18s linear infinite;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .screen-orbit-light:nth-child(2) { animation-delay: -9s; }
+
+    @keyframes screen-orbit {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: -100; }
+    }
+
+    @keyframes screen-edge-pulse {
+      0%, 100% {
+        border-color: rgba(255,255,255,.14);
+        box-shadow: inset 0 0 10px rgba(255,255,255,.04), 0 0 5px rgba(255,255,255,.08);
+      }
+      50% {
+        border-color: rgba(255,255,255,.62);
+        box-shadow: inset 0 0 20px rgba(255,255,255,.22), 0 0 18px rgba(255,255,255,.44);
+      }
+    }
+
+    .cursor-glow {
+      position: fixed;
+      z-index: 1300;
+      left: 0;
+      top: 0;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: rgba(255,255,255,.7);
+      box-shadow: 0 0 8px #fff, 0 0 22px rgba(255,255,255,.9), 0 0 44px rgba(255,255,255,.58);
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: width .18s ease, height .18s ease, opacity .16s ease;
+      pointer-events: none;
+      will-change: left, top;
+    }
+
+    .cursor-glow.visible { opacity: .9; }
+
+    .cursor-trail-dot {
+      position: fixed;
+      z-index: 1299;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 7px #fff, 0 0 18px rgba(255,255,255,.82);
+      transform: translate(-50%, -50%);
+      animation: cursor-trail-fade .7s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes cursor-trail-fade {
+      from { opacity: .72; scale: 1; }
+      to { opacity: 0; scale: .08; }
+    }
+
+    @media (pointer: coarse) {
+      .cursor-glow, .cursor-trail-dot { display: none; }
+    }
+
     .page-transition-flash {
+      --flash-x: 50vw;
+      --flash-y: 50vh;
+      --flash-angle: -12deg;
       position: fixed;
       z-index: 1200;
       inset: 0;
       overflow: hidden;
       background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,.96) 0, rgba(255,255,255,.52) 24%, rgba(255,255,255,.08) 68%, transparent 82%);
+        radial-gradient(circle at var(--flash-x) var(--flash-y), rgba(255,255,255,.49) 0, rgba(255,255,255,.39) 3%, rgba(255,255,255,.17) 10%, rgba(255,255,255,.05) 22%, transparent 44%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.72) 0, rgba(255,255,255,.42) 18%, rgba(255,255,255,.16) 38%, transparent 66%);
+      box-shadow: inset 0 0 0 0 rgba(255,255,255,0), inset 0 0 0 rgba(255,255,255,0);
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -482,22 +598,33 @@
     .page-transition-flash::before {
       position: absolute;
       z-index: 1;
-      left: -8%;
-      width: 116%;
-      height: 18vh;
+      left: var(--flash-x);
+      top: var(--flash-y);
+      width: min(64vmin, 620px);
+      aspect-ratio: 1;
       content: "";
-      background: linear-gradient(180deg, transparent, rgba(255,255,255,.98) 46%, transparent);
-      filter: blur(8px);
-      box-shadow: 0 0 50px rgba(255,255,255,.82);
-      transform: translateY(-22vh);
+      border: 2px solid rgba(255,255,255,.28);
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(from 0deg, rgba(255,255,255,.28) 0 1deg, transparent 1deg 16deg),
+        radial-gradient(circle, rgba(255,255,255,.16), transparent 66%);
+      filter: blur(1px) drop-shadow(0 0 24px rgba(255,255,255,.28));
+      mask-image: radial-gradient(circle, transparent 0 20%, #000 31% 67%, transparent 78%);
+      transform: translate(-50%, -50%) scale(.08) rotate(-10deg);
+      opacity: 0;
     }
 
     .page-transition-flash::after {
       position: absolute;
-      inset: 0;
+      left: var(--flash-x);
+      top: var(--flash-y);
+      width: max(90vw, 1100px);
+      height: 5px;
       content: "";
-      background: linear-gradient(180deg, transparent 0, rgba(5,5,5,.48) 42%, rgba(5,5,5,.72) 50%, rgba(5,5,5,.48) 58%, transparent 100%);
-      transform: translateY(-101%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.055) 24%, rgba(255,255,255,.32) 50%, rgba(255,255,255,.055) 76%, transparent);
+      box-shadow: 0 0 12px rgba(255,255,255,.3), 0 0 42px rgba(255,255,255,.25);
+      transform: translate(-50%, -50%) rotate(var(--flash-angle)) scaleX(.04);
+      opacity: 0;
     }
 
     .page-transition-flash.active {
@@ -507,8 +634,7 @@
 
     .page-transition-flash.active::before { animation: page-flash-line .68s var(--ease) both; }
     .page-transition-flash.active::after { animation: page-flash-sweep .68s var(--ease) both; }
-    .page-transition-flash.active.reverse::before { animation-name: page-flash-line-reverse; }
-    .page-transition-flash.active.reverse::after { animation-name: page-flash-sweep-reverse; }
+    .page-transition-flash.active.reverse { --flash-angle: 12deg; }
 
     @keyframes next-page-bounce {
       0%, 100% { transform: translateY(-5px); }
@@ -553,32 +679,43 @@
     }
 
     @keyframes page-flash {
-      0%, 100% { opacity: 0; }
+      0%, 100% {
+        opacity: 0;
+        box-shadow: inset 0 0 0 0 rgba(255,255,255,0), inset 0 0 0 rgba(255,255,255,0);
+      }
       12% { opacity: .25; }
-      28% { opacity: 1; }
-      52% { opacity: .48; }
+      28% {
+        opacity: 1;
+        box-shadow: inset 0 0 0 3px rgba(255,255,255,.9), inset 0 0 42px rgba(255,255,255,.46);
+      }
+      52% {
+        opacity: .48;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), inset 0 0 24px rgba(255,255,255,.22);
+      }
     }
 
     @keyframes page-flash-sweep {
-      0% { transform: translateY(-101%); }
-      72%, 100% { transform: translateY(101%); }
+      0% { transform: translate(-50%, -50%) rotate(var(--flash-angle)) scaleX(.04); opacity: 0; }
+      22% { opacity: .65; }
+      72%, 100% { transform: translate(-50%, -50%) rotate(var(--flash-angle)) scaleX(1.35); opacity: 0; }
     }
 
     @keyframes page-flash-sweep-reverse {
-      0% { transform: translateY(101%); }
-      72%, 100% { transform: translateY(-101%); }
+      0% { transform: translate(-50%, -50%) rotate(var(--flash-angle)) scaleX(.04); opacity: 0; }
+      22% { opacity: .65; }
+      72%, 100% { transform: translate(-50%, -50%) rotate(var(--flash-angle)) scaleX(1.35); opacity: 0; }
     }
 
     @keyframes page-flash-line {
-      0% { transform: translateY(-22vh); opacity: 0; }
-      12% { opacity: 1; }
-      78%, 100% { transform: translateY(106vh); opacity: 0; }
+      0% { transform: translate(-50%, -50%) scale(.08) rotate(-10deg); opacity: 0; }
+      18% { opacity: .65; }
+      78%, 100% { transform: translate(-50%, -50%) scale(1.22) rotate(18deg); opacity: 0; }
     }
 
     @keyframes page-flash-line-reverse {
-      0% { transform: translateY(106vh); opacity: 0; }
-      12% { opacity: 1; }
-      78%, 100% { transform: translateY(-22vh); opacity: 0; }
+      0% { transform: translate(-50%, -50%) scale(.08) rotate(10deg); opacity: 0; }
+      18% { opacity: .65; }
+      78%, 100% { transform: translate(-50%, -50%) scale(1.22) rotate(-18deg); opacity: 0; }
     }
 
     .music-control {
@@ -1157,7 +1294,13 @@
     }
 
     .profile-content h2 { text-shadow: 0 2px 4px var(--ink), 0 0 30px rgba(5,5,5,.9); }
-    .profile-content h2 em { color: transparent; font-style: normal; -webkit-text-stroke: 1px var(--paper); }
+    .profile-content h2 .profile-title-white { color: var(--paper); }
+    .profile-content h2 .profile-title-black {
+      color: transparent;
+      font-style: normal;
+      -webkit-text-stroke: 1px var(--paper);
+      text-shadow: none;
+    }
 
     .profile-copy {
       max-width: 650px;
@@ -2915,6 +3058,116 @@
       .icon-divider-loop, .icon-divider-item { gap: 22px; }
       .icon-divider-loop { padding-right: 22px; }
       .icon-divider-item img { width: 44px; height: 44px; }
+
+      /* Phone page framing: every navigation stop occupies one visible screen. */
+      .hero { height: 100svh; min-height: 100svh; }
+      .cinematic,
+      .profile,
+      .games,
+      .projects,
+      .terminal-section,
+      .footer {
+        box-sizing: border-box;
+        height: calc(100svh - 62px);
+        min-height: calc(100svh - 62px);
+        scroll-margin-top: 62px;
+        overflow: hidden;
+      }
+
+      .intro-float-icon { width: 58px; }
+      .floating-icon { width: 64px; }
+      .orbit-icon { width: 72px; }
+
+      .cinematic { min-height: calc(100svh - 62px); }
+      .cinematic--games,
+      .cinematic--terminal { min-height: calc(100svh - 62px); }
+      .cinematic-image { inset: -5%; width: 110%; height: 110%; }
+      .cinematic--about .cinematic-image { object-position: center 28%; }
+      .cinematic--games .cinematic-image { object-position: center 10%; }
+      .cinematic--terminal .cinematic-image { object-position: center 19%; }
+      .cinematic--profiles .cinematic-image { inset: 0; width: 100%; height: 100%; object-position: center 44%; }
+      .cinematic-line.primary { font-size: clamp(2.35rem, 12vw, 3.45rem); }
+      .cinematic-line.outline { font-size: clamp(2.05rem, 10.8vw, 3.1rem); }
+
+      .profile { padding: 70px 0 18px; }
+      .profile > .page { display: grid; align-items: center; height: 100%; }
+      .profile-grid {
+        grid-template-columns: 112px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+      }
+      .profile-photo-shell { width: 100%; margin: 0; }
+      .profile-photo-shell::after { inset: 6px -6px -6px 6px; }
+      .profile-stamp { right: -8px; top: -32px; width: 54px; height: 54px; }
+      .profile-content h2 { margin: 6px 0 10px; font-size: clamp(2rem, 9.8vw, 2.7rem); }
+      .profile-copy { margin: 0; font-size: .65rem; line-height: 1.38; }
+      .profile-copy p { margin-block: 0 7px; }
+      .facts { grid-template-columns: repeat(3, 1fr); margin-top: 10px; }
+      .fact { min-height: 72px; padding: 8px 7px; font-size: .58rem; line-height: 1.3; }
+      .fact small { margin-bottom: 7px; font-size: .48rem; }
+      .profile-notes { margin-top: 8px; }
+      .profile-note-tabs { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+      .profile-note-button { min-height: 38px; padding: 7px 24px 7px 7px; font-size: .5rem; }
+      .profile-note-button::after { width: 21px; }
+      .profile-note-output { min-height: 66px; gap: 5px; margin-top: 6px; padding: 9px; }
+      .profile-note-label { font-size: .46rem; }
+      .profile-note-text { font-size: .6rem; line-height: 1.35; }
+      .profile.profile-locked { height: calc(100svh - 62px); min-height: calc(100svh - 62px); }
+      .profile-hatch { min-height: 100%; }
+      .hatch-assembly { gap: 8px; transform: scale(.84); }
+      .hatch-frame { width: min(66vw, 270px); }
+      .hatch-wheel { width: min(38vw, 150px); }
+      .hatch-instruction { font-size: .92rem; }
+      .hatch-help { max-width: 270px; font-size: .52rem; }
+
+      .games { padding: 72px 0 18px; }
+      .games > .page { display: grid; align-content: center; height: 100%; }
+      .games-header { margin-bottom: 12px; }
+      .games h2 { margin: 8px 0 0; font-size: clamp(2.65rem, 13vw, 3.7rem); }
+      .games-note { max-width: 210px; font-size: .56rem; }
+      .player-stage { min-height: 0; height: min(58svh, 470px); }
+      .player-stage .game-list { align-content: center; }
+      .game-row { min-height: 0; padding-block: 14px; }
+      .game-name { font-size: clamp(1rem, 5.2vw, 1.4rem); }
+      .game-id { font-size: .55rem; }
+      .player-curtain-label { width: min(78%, 280px); min-height: 62px; font-size: .58rem; }
+
+      .projects { padding: 72px 0 16px; }
+      .projects > .page { height: 100%; }
+      .projects-content { display: grid; align-content: center; }
+      .projects h2 { margin: 5px 0 12px; font-size: clamp(2.6rem, 13vw, 3.6rem); }
+      .archive-layout { grid-template-columns: 88px minmax(0, 1fr); gap: 10px; align-items: stretch; }
+      .archive-visual { min-height: 0; height: 100%; aspect-ratio: auto; }
+      .archive-visual img { height: 100%; object-fit: cover; }
+      .archive-caption { padding: 6px; font-size: .42rem; }
+      .project-card { min-height: 78px; gap: 6px; padding: 9px 5px; }
+      .project-title { font-size: clamp(.9rem, 4.4vw, 1.15rem); }
+      .project-desc { font-size: .5rem; line-height: 1.3; }
+      .project-go { width: 26px; height: 26px; }
+      .projects-lock-ui { transform: scale(.82); }
+      .vault-lock-button { width: 190px; min-height: 218px; }
+
+      .terminal-section { padding: 72px 0 16px; }
+      .terminal-section > .page { display: grid; align-content: center; height: 100%; }
+      .terminal-header { margin-bottom: 10px; }
+      .terminal-header h2 { font-size: clamp(2.6rem, 13vw, 3.6rem); }
+      .terminal-header p { margin-top: 7px; font-size: .54rem; line-height: 1.35; }
+      .terminal-bar { min-height: 30px; padding-inline: 10px; font-size: .48rem; }
+      .terminal-command { min-height: 38px; padding-inline: 8px; font-size: .54rem; }
+      .terminal-output { min-height: 185px; padding: 16px 13px; }
+      .terminal-result-title { font-size: clamp(1.35rem, 7vw, 2rem); }
+      .terminal-result-copy { font-size: .58rem; }
+      .gift-button { min-height: 118px; }
+
+      .footer { padding: 72px 0 14px; }
+      .footer > .page { display: grid; align-content: center; height: 100%; }
+      .footer-grid { gap: 12px; }
+      .footer h2 { margin-block: 5px 8px; font-size: clamp(2.7rem, 14vw, 3.8rem); }
+      .footer-note { margin-bottom: 10px; }
+      .footer .button { min-height: 50px; }
+      .footer-signoff { margin-top: 15px; font-size: clamp(1.5rem, 8vw, 2.2rem); }
+      .footer-art { width: min(100%, 310px); margin: 0 auto; }
+      .footer-bottom { flex-direction: row; margin-top: 14px; font-size: .5rem; }
     }
 
     @media (pointer: fine) {
@@ -2960,6 +3213,13 @@
   <noscript><style>body.intro-active{overflow:auto}.intro-screen,.hero-entry-doors{display:none}.hero-grid{opacity:1!important;transform:none!important}</style></noscript>
 
   <div class="scroll-progress" aria-hidden="true"></div>
+  <div class="screen-orbit-lights" aria-hidden="true">
+    <svg class="screen-orbit-svg" aria-hidden="true" focusable="false">
+      <rect class="screen-orbit-light" pathLength="100"></rect>
+      <rect class="screen-orbit-light" pathLength="100"></rect>
+    </svg>
+  </div>
+  <span class="cursor-glow" id="cursor-glow" aria-hidden="true"></span>
 
   <nav class="site-nav" aria-label="Primary navigation">
     <a class="brand" href="#top" aria-label="Veikuno, back to top"><span class="brand-mark">VK</span> VEIKUNO</a>
@@ -3058,9 +3318,9 @@
 
         <div class="profile-content reveal from-right">
           <span class="section-number">01 / Profile</span>
-          <h2>Welcome to my <em>portfolio.</em></h2>
+          <h2><span class="profile-title-white">Welcome to</span> <span class="profile-title-black">my portfolio.</span></h2>
           <div class="profile-copy">
-            <p>Hi, my name is Leo and I'm from Sydney, Australia. I like playing games, watching anime, drumming, and calisthenics.</p>
+            <p>Hi, my name is Leo and I'm from Sydney, Australia.</p>
             <p>If you would like to be mutuals feel free to add me on Instagram or Discord!</p>
           </div>
           <div class="facts stagger">
@@ -3505,7 +3765,49 @@
     };
 
     let interactionFlashTimer;
-    const triggerInteractionFlash = (reverse = false) => {
+    let lastFlashPoint = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    const rememberFlashPoint = (event) => {
+      if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+      lastFlashPoint = { x: event.clientX, y: event.clientY };
+    };
+
+    document.addEventListener('pointermove', rememberFlashPoint, { passive: true });
+    document.addEventListener('pointerdown', rememberFlashPoint, { passive: true });
+
+    const resolveFlashPoint = (origin) => {
+      const hasPointerCoordinates = origin
+        && Number.isFinite(origin.clientX)
+        && Number.isFinite(origin.clientY)
+        && (origin.clientX !== 0 || origin.clientY !== 0 || origin.pointerType);
+
+      if (hasPointerCoordinates) return { x: origin.clientX, y: origin.clientY };
+
+      const element = origin instanceof Element
+        ? origin
+        : origin?.currentTarget instanceof Element
+          ? origin.currentTarget
+          : document.activeElement instanceof Element
+            ? document.activeElement
+            : null;
+
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.width || rect.height) {
+          return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        }
+      }
+
+      return lastFlashPoint;
+    };
+
+    const triggerInteractionFlash = (reverse = false, origin = null) => {
+      const point = resolveFlashPoint(origin);
+      const x = Math.max(0, Math.min(window.innerWidth, point.x));
+      const y = Math.max(0, Math.min(window.innerHeight, point.y));
+      lastFlashPoint = { x, y };
+      pageTransitionFlash.style.setProperty('--flash-x', `${x}px`);
+      pageTransitionFlash.style.setProperty('--flash-y', `${y}px`);
       clearTimeout(interactionFlashTimer);
       pageTransitionFlash.classList.remove('active', 'reverse');
       void pageTransitionFlash.offsetWidth;
@@ -3717,9 +4019,9 @@ musicVolume.addEventListener('input', () => {
       output.innerHTML = '<span class="terminal-prompt">visitor@veikuno:~$ awaiting command</span><strong class="terminal-result-title">Connection ready.</strong><p class="terminal-result-copy">Select a command from the menu to begin.</p>';
     };
 
-    giftButton.addEventListener('click', () => {
+    giftButton.addEventListener('click', (event) => {
       if (terminalGift.classList.contains('opened') || giftButton.classList.contains('click-shake')) return;
-      triggerInteractionFlash();
+      triggerInteractionFlash(false, event);
       playSound('gift');
       giftButton.classList.add('click-shake');
       setTimeout(() => {
@@ -3750,9 +4052,9 @@ musicVolume.addEventListener('input', () => {
       projectsContent.setAttribute('aria-hidden', 'true');
     };
 
-    vaultLockButton.addEventListener('click', () => {
+    vaultLockButton.addEventListener('click', (event) => {
       if (lockStage >= 3) return;
-      triggerInteractionFlash();
+      triggerInteractionFlash(false, event);
       lockStage += 1;
       const remaining = 3 - lockStage;
       projectsLockScreen.dataset.stage = String(lockStage);
@@ -3819,10 +4121,10 @@ musicVolume.addEventListener('input', () => {
       }
     }, reducedMotion ? 30 : 75);
 
-    introEnter.addEventListener('click', () => {
+    introEnter.addEventListener('click', (event) => {
       musicControl.classList.add("music-exiting");
       getAudioContext();
-      triggerInteractionFlash();
+      triggerInteractionFlash(false, event);
       playSound('enter');
       if (!backgroundMusic.muted) backgroundMusic.play().catch(() => {});
       introScreen.classList.add('leaving');
@@ -3890,9 +4192,34 @@ musicVolume.addEventListener('input', () => {
     ].map((stop) => ({ ...stop, element: document.getElementById(stop.id) })).filter((stop) => stop.element);
 
     const getPageStopTop = (stop) => stop.element.getBoundingClientRect().top + window.scrollY;
+    const isMobilePageLayout = () => window.matchMedia('(max-width: 640px)').matches;
+
+    const getPageDestination = (stop) => {
+      const navigationHeight = siteNav.getBoundingClientRect().height;
+      return Math.max(0, getPageStopTop(stop) - navigationHeight);
+    };
+
+    const scrollToPageStop = (stop) => {
+      const move = () => window.scrollTo({
+        top: getPageDestination(stop),
+        behavior: reducedMotion ? 'auto' : 'smooth'
+      });
+
+      setTimeout(move, reducedMotion ? 0 : 115);
+
+      if (isMobilePageLayout() && !reducedMotion) {
+        setTimeout(() => {
+          window.scrollTo({ top: getPageDestination(stop), behavior: 'auto' });
+          updateNextPageControl();
+        }, 760);
+      }
+    };
 
     const getCurrentPageIndex = () => {
-      const marker = window.scrollY + Math.min(window.innerHeight * .34, 300);
+      const markerOffset = isMobilePageLayout()
+        ? siteNav.getBoundingClientRect().height + 10
+        : Math.min(window.innerHeight * .34, 300);
+      const marker = window.scrollY + markerOffset;
       let currentIndex = 0;
       pageStops.forEach((stop, index) => {
         if (getPageStopTop(stop) <= marker) currentIndex = index;
@@ -3924,23 +4251,16 @@ musicVolume.addEventListener('input', () => {
       }
     };
 
-    previousPageControl.addEventListener('click', () => {
+    previousPageControl.addEventListener('click', (event) => {
       const previousStop = pageStops[getCurrentPageIndex() - 1];
       if (!previousStop) return;
 
       previousPageControl.classList.remove('jumping');
-      pageTransitionFlash.classList.remove('active');
-      pageTransitionFlash.classList.add('reverse');
-      void pageTransitionFlash.offsetWidth;
       previousPageControl.classList.add('jumping');
-      pageTransitionFlash.classList.add('active');
+      triggerInteractionFlash(true, event);
       playSound('page-flash');
 
-      const navigationHeight = siteNav.getBoundingClientRect().height;
-      const destination = Math.max(0, getPageStopTop(previousStop) - navigationHeight);
-      setTimeout(() => {
-        window.scrollTo({ top: destination, behavior: reducedMotion ? 'auto' : 'smooth' });
-      }, reducedMotion ? 0 : 115);
+      scrollToPageStop(previousStop);
 
       setTimeout(() => {
         previousPageControl.classList.remove('jumping');
@@ -3949,22 +4269,16 @@ musicVolume.addEventListener('input', () => {
       }, reducedMotion ? 40 : 720);
     });
 
-    nextPageControl.addEventListener('click', () => {
+    nextPageControl.addEventListener('click', (event) => {
       const nextStop = pageStops[getCurrentPageIndex() + 1];
       if (!nextStop) return;
 
       nextPageControl.classList.remove('jumping');
-      pageTransitionFlash.classList.remove('active', 'reverse');
-      void pageTransitionFlash.offsetWidth;
       nextPageControl.classList.add('jumping');
-      pageTransitionFlash.classList.add('active');
+      triggerInteractionFlash(false, event);
       playSound('page-flash');
 
-      const navigationHeight = siteNav.getBoundingClientRect().height;
-      const destination = Math.max(0, getPageStopTop(nextStop) - navigationHeight);
-      setTimeout(() => {
-        window.scrollTo({ top: destination, behavior: reducedMotion ? 'auto' : 'smooth' });
-      }, reducedMotion ? 0 : 115);
+      scrollToPageStop(nextStop);
 
       setTimeout(() => {
         nextPageControl.classList.remove('jumping');
@@ -4073,10 +4387,10 @@ musicVolume.addEventListener('input', () => {
       copyTimer = setTimeout(() => copyMessage.classList.remove('visible'), 1800);
     };
 
-    playerCurtain.addEventListener('click', () => {
+    playerCurtain.addEventListener('click', (event) => {
       const playerCurtainLabel = playerCurtain.querySelector('.player-curtain-label');
       if (playerCurtainLabel.classList.contains('click-shake')) return;
-      triggerInteractionFlash();
+      triggerInteractionFlash(false, event);
       playSound('door');
       playerCurtainLabel.classList.add('click-shake');
       setTimeout(() => {
@@ -4088,8 +4402,8 @@ musicVolume.addEventListener('input', () => {
     });
 
     document.querySelectorAll('[data-copy]').forEach((button) => {
-      button.addEventListener('click', () => {
-        triggerInteractionFlash();
+      button.addEventListener('click', (event) => {
+        triggerInteractionFlash(false, event);
         copyValue(button.dataset.copy);
       });
     });
@@ -4166,9 +4480,10 @@ musicVolume.addEventListener('input', () => {
     };
 
     document.querySelectorAll('.terminal-command').forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (event) => {
         const command = button.dataset.command;
         const content = terminalContent[command];
+        triggerInteractionFlash(false, event);
         terminalShell.classList.remove('channel-hit');
         void terminalShell.offsetWidth;
         terminalShell.classList.add('channel-hit');
@@ -4189,11 +4504,11 @@ musicVolume.addEventListener('input', () => {
     });
 
     document.querySelectorAll('.site-nav a, .back-to-top').forEach((element) => {
-      element.addEventListener('click', () => {
+      element.addEventListener('click', (event) => {
         const targetSelector = element.getAttribute('href');
         const target = targetSelector?.startsWith('#') ? document.querySelector(targetSelector) : null;
         const movingUp = target ? target.getBoundingClientRect().top + window.scrollY < window.scrollY : false;
-        triggerInteractionFlash(movingUp);
+        triggerInteractionFlash(movingUp, event);
         playSound('click');
       });
     });
@@ -4201,6 +4516,28 @@ musicVolume.addEventListener('input', () => {
     document.querySelectorAll('.hero-actions a, .project-card, .anime-link, .footer a').forEach((element) => {
       element.addEventListener('click', () => playSound('click'));
     });
+
+    const cursorGlow = document.getElementById('cursor-glow');
+    let lastTrailTime = 0;
+
+    window.addEventListener('pointermove', (event) => {
+      if (event.pointerType === 'touch') return;
+      cursorGlow.style.left = `${event.clientX}px`;
+      cursorGlow.style.top = `${event.clientY}px`;
+      cursorGlow.classList.add('visible');
+
+      const now = performance.now();
+      if (reducedMotion || now - lastTrailTime < 28) return;
+      lastTrailTime = now;
+      const dot = document.createElement('span');
+      dot.className = 'cursor-trail-dot';
+      dot.style.left = `${event.clientX}px`;
+      dot.style.top = `${event.clientY}px`;
+      document.body.appendChild(dot);
+      dot.addEventListener('animationend', () => dot.remove(), { once: true });
+    }, { passive: true });
+
+    document.documentElement.addEventListener('pointerleave', () => cursorGlow.classList.remove('visible'));
   </script>
 </body>
 </html>
